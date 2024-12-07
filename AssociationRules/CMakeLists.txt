@@ -23,10 +23,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(AssociationRules
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        tabs/grid.h tabs/grid.cpp
-        tabs/frequentitemset.h tabs/frequentitemset.cpp
-        tabs/distance.h tabs/distance.cpp
-        tabs/rareitemst.h tabs/rareitemst.cpp
+        tabs/Grid/grid.h tabs/Grid/grid.cpp
+        tabs/FrequentItemset/frequentitemset.h tabs/FrequentItemset/frequentitemset.cpp
+        tabs/Distance/distance.h tabs/Distance/distance.cpp
+        tabs/RareItemset/rareitemset.h tabs/RareItemset/rareitemset.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET AssociationRules APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
