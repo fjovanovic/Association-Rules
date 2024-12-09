@@ -2,6 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
+#include <QMessageBox>
+
+#include "tabs/Grid/grid.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,6 +21,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+    Grid *gridTab;
+
+public slots:
+    void gridOnBrowseButtonClicked();
+    void gridOnRunAlgorithmClicked();
+    void gridOnChangeButtonClicked();
 
 private:
     Ui::MainWindow *ui;
