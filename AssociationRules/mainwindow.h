@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
 #include "tabs/Grid/grid.h"
 
@@ -31,5 +34,8 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+    QGraphicsScene *gridScene;
+
+    void gridConfig();
 };
 #endif // MAINWINDOW_H
