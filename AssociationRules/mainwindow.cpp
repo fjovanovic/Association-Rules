@@ -67,14 +67,14 @@ void MainWindow::gridConfig()
 
 void MainWindow::gridOnBrowseButtonClicked()
 {
-    QString filePath = gridTab->onBrowseButtonClicked(this);
+    QString filePath = gridTab->onBrowseButtonClicked();
     ui->gridInputFileLine->setText(filePath);
 }
 
 
 void MainWindow::gridOnChangeButtonClicked()
 {
-    QString filePath = gridTab->onChangeButtonClicked(this);
+    QString filePath = gridTab->onChangeButtonClicked();
     ui->gridOutputFileLine->setText(filePath);
 }
 
@@ -98,7 +98,7 @@ void MainWindow::gridOnRunAlgorithmClicked()
                 QMessageBox::critical(this, "Error", "Minimum support must be in scope (0, 1]");
                 return;
             }
-            gridTab->onRunAlgorithmClicked(this, minSup);
+            gridTab->onRunAlgorithmClicked(gridScene, minSup);
         } else {
             QMessageBox::critical(this, "Error", "Minimum support must be number (float or integer)");
         }
