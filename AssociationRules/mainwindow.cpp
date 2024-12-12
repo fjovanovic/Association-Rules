@@ -83,8 +83,7 @@ void MainWindow::gridOnRunAlgorithmClicked()
 {
     QTableWidgetItem *minSupCell = ui->gridParametersTable->item(0, 1);
     if(minSupCell) {
-        QString cellText = minSupCell->text().trimmed();
-        cellText.replace(",", ".");
+        QString cellText = minSupCell->text().trimmed().replace(",", ".");
         if(cellText == "") {
             QMessageBox::critical(this, "Error", "Minimum support not entered");
             return;
@@ -98,6 +97,16 @@ void MainWindow::gridOnRunAlgorithmClicked()
                 QMessageBox::critical(this, "Error", "Minimum support must be in scope (0, 1]");
                 return;
             }
+
+            if(ui->gridGraphicsView->scene() != nullptr) {
+                delete ui->gridGraphicsView->scene();
+            }
+
+            gridScene = new QGraphicsScene();
+            gridScene->setSceneRect(0, 0, 800, 600);
+            ui->gridGraphicsView->setScene(gridScene);
+            ui->gridGraphicsView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+
             gridTab->onRunAlgorithmClicked(gridScene, minSup);
         } else {
             QMessageBox::critical(this, "Error", "Minimum support must be number (float or integer)");
