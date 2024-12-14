@@ -47,9 +47,6 @@ void MainWindow::gridConfig()
         QMessageBox::critical(this, "Error", "Problem with getting example cell");
     }
 
-    gridScene = new QGraphicsScene();
-    ui->gridGraphicsView->setScene(gridScene);
-
     ui->gridParametersTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     int rowCount = ui->gridParametersTable->rowCount();
     int columnCount = ui->gridParametersTable->columnCount();
@@ -81,11 +78,18 @@ void MainWindow::gridOnChangeButtonClicked()
 
 void MainWindow::gridOnRunAlgorithmClicked()
 {
+    this->setCursor(Qt::WaitCursor);
+    ui->gridRunAlgorithmButton->setDisabled(true);
+
     QTableWidgetItem *minSupCell = ui->gridParametersTable->item(0, 1);
     if(minSupCell) {
         QString cellText = minSupCell->text().trimmed().replace(",", ".");
         if(cellText == "") {
             QMessageBox::critical(this, "Error", "Minimum support not entered");
+
+            this->setCursor(Qt::ArrowCursor);
+            ui->gridRunAlgorithmButton->setDisabled(false);
+
             return;
         }
 
@@ -95,6 +99,10 @@ void MainWindow::gridOnRunAlgorithmClicked()
         if(success) {
             if(minSup <= 0 || minSup > 1) {
                 QMessageBox::critical(this, "Error", "Minimum support must be in scope (0, 1]");
+
+                this->setCursor(Qt::ArrowCursor);
+                ui->gridRunAlgorithmButton->setDisabled(false);
+
                 return;
             }
 
@@ -114,6 +122,9 @@ void MainWindow::gridOnRunAlgorithmClicked()
     } else {
         QMessageBox::critical(this, "Error", "Problem with getting parameter cell");
     }
+
+    this->setCursor(Qt::ArrowCursor);
+    ui->gridRunAlgorithmButton->setDisabled(false);
 }
 
 
