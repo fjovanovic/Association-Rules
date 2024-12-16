@@ -80,6 +80,7 @@ void MainWindow::gridOnRunAlgorithmClicked()
 {
     this->setCursor(Qt::WaitCursor);
     ui->gridRunAlgorithmButton->setDisabled(true);
+    QCoreApplication::processEvents();
 
     QTableWidgetItem *minSupCell = ui->gridParametersTable->item(0, 1);
     if(minSupCell) {
@@ -120,7 +121,7 @@ void MainWindow::gridOnRunAlgorithmClicked()
             QMessageBox::critical(this, "Error", "Minimum support must be number (float or integer)");
         }
     } else {
-        QMessageBox::critical(this, "Error", "Problem with getting parameter cell");
+        QMessageBox::critical(this, "Error", "Minimum support not entered");
     }
 
     this->setCursor(Qt::ArrowCursor);
