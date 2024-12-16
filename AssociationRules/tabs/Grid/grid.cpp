@@ -8,7 +8,7 @@ Grid::Grid()
 
     _inputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/";
     _outputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/";
-    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/input.txt";
+    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/input4_100000.txt";
     _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output.txt";
 
     _gridWidth = 0;
@@ -113,6 +113,8 @@ void Grid::onRunAlgorithmClicked(QGraphicsScene *scene, const double minSupport)
     if(!saveFileSuccess) {
         return;
     }
+
+    _gridWidth = 0;
 }
 
 
