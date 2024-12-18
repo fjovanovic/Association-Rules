@@ -27,15 +27,39 @@ QString FrequentItemset::getOutputFilePath()
 
 QString FrequentItemset::onBrowseButtonClicked()
 {
-    return "";
-    // TODO
+    QString filePath = QFileDialog::getOpenFileName(
+        nullptr,
+        "Select File",
+        _inputOpenFilePath,
+        "Text files (*.txt)"
+    );
+
+    if(filePath.isEmpty()) {
+        return _inputFilePath;
+    }
+
+    _inputFilePath = filePath;
+
+    return filePath;
 }
 
 
 QString FrequentItemset::onChangeButtonClicked()
 {
-    return "";
-    // TODO
+    QString filePath = QFileDialog::getOpenFileName(
+        nullptr,
+        "Select File",
+        _outputOpenFilePath,
+        "Text files (*.txt)"
+    );
+
+    if(filePath.isEmpty()) {
+        return _outputFilePath;
+    }
+
+    _outputFilePath = filePath;
+
+    return filePath;
 }
 
 
