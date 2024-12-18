@@ -448,6 +448,10 @@ bool Grid::saveFile(
         return false;
     }
 
+    const int itemsetWidth = 20;
+    const int supportWidth = 30;
+    const int categoryWidth = 20;
+
     QTextStream out(&file);
     for(const auto &pair : frequentItemsets) {
         const QVector<int> &itemset = pair.first;
@@ -475,8 +479,12 @@ bool Grid::saveFile(
         itemsetString = itemsetString.removeLast().removeLast();
         itemsetString += "}";
 
-        out << itemsetString << "\t#SUP: " << support << "(" << supportPerc << "%)\t\t[" << category << "]\n";
-
+        out << itemsetString.leftJustified(itemsetWidth)
+            << QString("#SUP: %1 (%2%)")
+               .arg(support)
+               .arg(supportPerc)
+               .leftJustified(supportWidth)
+            << category.leftJustified(categoryWidth) << "\n";
     }
 
     file.close();
