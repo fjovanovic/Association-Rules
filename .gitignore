@@ -1,4 +1,6 @@
 build-AssociationRules*/
+**/resources/*/*
+!**/resources/*/input*.txt
 
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
