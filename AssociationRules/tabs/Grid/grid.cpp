@@ -128,12 +128,25 @@ bool Grid::readFile(QSet<int> &gridItems)
 
     QTextStream in(&file);
     while(!in.atEnd()) {
-        QString line = in.readLine();
+        QString line = in.readLine().trimmed();
+
+        if(line.isEmpty()) {
+            QMessageBox::critical(nullptr, "Error", "Invalid input file: Empty line");
+            return false;
+        }
+
         QStringList items = line.split(" ", Qt::SkipEmptyParts);
         QVector<int> transaction;
-        for(QString &item : items) {
-            int itemInt = item.toInt();
-            if(gridItems.find(itemInt) == gridItems.end()) {
+        for(const QString &item : items) {
+            bool isNumber = false;
+            int itemInt = item.toInt(&isNumber);
+
+            if(!isNumber) {
+                QMessageBox::critical(nullptr, "Error", "Invalid input file: Non-numeric value");
+                return false;
+            }
+
+            if(!gridItems.contains(itemInt)) {
                 gridItems.insert(itemInt);
             }
             transaction.append(itemInt);
