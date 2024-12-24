@@ -233,7 +233,7 @@
            <widget class="QGraphicsView" name="freqGraphicsView"/>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
             <property name="spacing">
              <number>15</number>
             </property>
@@ -269,13 +269,6 @@
               </property>
               <property name="text">
                <string>Forward</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="freqBackButton">
-              <property name="text">
-               <string>Back</string>
               </property>
              </widget>
             </item>
