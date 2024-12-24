@@ -8,21 +8,20 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    frequentItemsetTab = new FrequentItemset();
+    _frequentItemsetTab = new FrequentItemset();
     MainWindow::frequentItemsetConfig();
 
     connect(ui->freqBrowseButton, &QPushButton::clicked, this, &MainWindow::freqOnBrowseButtonClicked);
     connect(ui->freqChangeButton, &QPushButton::clicked, this, &MainWindow::freqOnChangeButtonClicked);
     connect(ui->freqRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::freqOnRunAlgorithmButtonClicked);
     connect(ui->freqForwardButton, &QPushButton::clicked, this, &MainWindow::freqOnForwardButtonClicked);
-    connect(ui->freqBackButton, &QPushButton::clicked, this, &MainWindow::freqOnBackButtonClicked);
 }
 
 
 void MainWindow::frequentItemsetConfig()
 {
-    QString inputFilePath = frequentItemsetTab->getInputFilePath();
-    QString outputFilePath = frequentItemsetTab->getOutputFilePath();
+    QString inputFilePath = _frequentItemsetTab->getInputFilePath();
+    QString outputFilePath = _frequentItemsetTab->getOutputFilePath();
     ui->freqInputFileLine->setText(inputFilePath);
     ui->freqOutputFileLine->setText(outputFilePath);
 
@@ -62,19 +61,21 @@ void MainWindow::frequentItemsetConfig()
         }
     }
 
+    _frequentItemsetScene = new QGraphicsScene();
+    ui->freqGraphicsView->setScene(_frequentItemsetScene);
 }
 
 
 void MainWindow::freqOnBrowseButtonClicked()
 {
-    QString filePath = frequentItemsetTab->onBrowseButtonClicked();
+    QString filePath = _frequentItemsetTab->onBrowseButtonClicked();
     ui->freqInputFileLine->setText(filePath);
 }
 
 
 void MainWindow::freqOnChangeButtonClicked()
 {
-    QString filePath = frequentItemsetTab->onChangeButtonClicked();
+    QString filePath = _frequentItemsetTab->onChangeButtonClicked();
     ui->freqOutputFileLine->setText(filePath);
 }
 
@@ -110,16 +111,7 @@ void MainWindow::freqOnRunAlgorithmButtonClicked()
                 return;
             }
 
-            if(ui->freqGraphicsView->scene() != nullptr) {
-                delete ui->freqGraphicsView->scene();
-            }
-
-            frequentItemsetScene = new QGraphicsScene();
-            frequentItemsetScene->setSceneRect(0, 0, 800, 600);
-            ui->freqGraphicsView->setScene(frequentItemsetScene);
-            ui->freqGraphicsView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-            frequentItemsetTab->onRunAlgorithmButtonClicked(frequentItemsetScene, minSup);
+            _frequentItemsetTab->onRunAlgorithmButtonClicked(_frequentItemsetScene, minSup);
         } else {
             QMessageBox::critical(this, "Error", "Minimum support must be number (float or integer)");
         }
@@ -134,19 +126,15 @@ void MainWindow::freqOnRunAlgorithmButtonClicked()
 
 void MainWindow::freqOnForwardButtonClicked()
 {
-    // TODO
-}
-
-
-void MainWindow::freqOnBackButtonClicked()
-{
-    // TODO
+    setCursor(Qt::WaitCursor);
+    _frequentItemsetTab->onForwardButtonClicked(_frequentItemsetScene);
+    setCursor(Qt::ArrowCursor);
 }
 
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete frequentItemsetTab;
-    delete frequentItemsetScene;
+    delete _frequentItemsetTab;
+    delete _frequentItemsetScene;
 }

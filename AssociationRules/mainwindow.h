@@ -23,18 +23,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    FrequentItemset *frequentItemsetTab;
-
 public slots:
     void freqOnBrowseButtonClicked();
     void freqOnChangeButtonClicked();
     void freqOnRunAlgorithmButtonClicked();
     void freqOnForwardButtonClicked();
-    void freqOnBackButtonClicked();
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *frequentItemsetScene;
+    FrequentItemset *_frequentItemsetTab;
+    QGraphicsScene *_frequentItemsetScene;
 
     void frequentItemsetConfig();
 };
