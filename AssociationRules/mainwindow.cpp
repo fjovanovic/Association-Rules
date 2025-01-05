@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("Association Rules");
 
     _frequentItemsetTab = new FrequentItemset();
     MainWindow::frequentItemsetConfig();
@@ -33,6 +34,9 @@ void MainWindow::frequentItemsetConfig()
 
     QTableWidgetItem *headerItem3 = new QTableWidgetItem(QString("Example"), QTableWidgetItem::Type);
     ui->freqParametersTable->setHorizontalHeaderItem(2, headerItem3);
+
+    QTableWidgetItem *headerItem4 = new QTableWidgetItem(QString(""), QTableWidgetItem::Type);
+    ui->freqParametersTable->setItem(0, 1, headerItem4);
 
     QTableWidgetItem *parameterCell = ui->freqParametersTable->item(0, 0);
     if(parameterCell) {
