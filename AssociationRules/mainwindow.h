@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGraphicsScene>
 
 #include "tabs/Grid/grid.h"
 
@@ -25,16 +24,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    Grid *gridTab;
-
 public slots:
     void gridOnBrowseButtonClicked();
-    void gridOnRunAlgorithmClicked();
     void gridOnChangeButtonClicked();
+    void gridOnRunAlgorithmButtonClicked();
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *gridScene;
+    Grid *_gridTab;
+    QGraphicsScene *_gridScene;
 
     void gridConfig();
 };

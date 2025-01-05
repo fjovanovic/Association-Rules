@@ -8,19 +8,19 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    gridTab = new Grid();
+    _gridTab = new Grid();
     MainWindow::gridConfig();
 
     connect(ui->gridBrowseButton, &QPushButton::clicked, this, &MainWindow::gridOnBrowseButtonClicked);
     connect(ui->gridChangeButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeButtonClicked);
-    connect(ui->gridRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::gridOnRunAlgorithmClicked);
+    connect(ui->gridRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::gridOnRunAlgorithmButtonClicked);
 }
 
 
 void MainWindow::gridConfig()
 {
-    QString inputFilePath = gridTab->getInputFilePath();
-    QString outputFilePath = gridTab->getOutputFilePath();
+    QString inputFilePath = _gridTab->getInputFilePath();
+    QString outputFilePath = _gridTab->getOutputFilePath();
     ui->gridInputFileLine->setText(inputFilePath);
     ui->gridOutputFileLine->setText(outputFilePath);
 
@@ -32,6 +32,9 @@ void MainWindow::gridConfig()
 
     QTableWidgetItem *headerItem3 = new QTableWidgetItem(QString("Example"), QTableWidgetItem::Type);
     ui->gridParametersTable->setHorizontalHeaderItem(2, headerItem3);
+
+    QTableWidgetItem *headerItem4 = new QTableWidgetItem(QString(""), QTableWidgetItem::Type);
+    ui->gridParametersTable->setItem(0, 1, headerItem4);
 
     QTableWidgetItem *parameterCell = ui->gridParametersTable->item(0, 0);
     if(parameterCell) {
@@ -59,26 +62,30 @@ void MainWindow::gridConfig()
             }
         }
     }
+
+    _gridScene = new QGraphicsScene();
+    ui->gridGraphicsView->setScene(_gridScene);
+    ui->gridGraphicsView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 }
 
 
 void MainWindow::gridOnBrowseButtonClicked()
 {
-    QString filePath = gridTab->onBrowseButtonClicked();
+    QString filePath = _gridTab->onBrowseButtonClicked();
     ui->gridInputFileLine->setText(filePath);
 }
 
 
 void MainWindow::gridOnChangeButtonClicked()
 {
-    QString filePath = gridTab->onChangeButtonClicked();
+    QString filePath = _gridTab->onChangeButtonClicked();
     ui->gridOutputFileLine->setText(filePath);
 }
 
 
-void MainWindow::gridOnRunAlgorithmClicked()
+void MainWindow::gridOnRunAlgorithmButtonClicked()
 {
-    this->setCursor(Qt::WaitCursor);
+    setCursor(Qt::WaitCursor);
     ui->gridRunAlgorithmButton->setDisabled(true);
     QCoreApplication::processEvents();
 
@@ -88,7 +95,7 @@ void MainWindow::gridOnRunAlgorithmClicked()
         if(cellText == "") {
             QMessageBox::critical(this, "Error", "Minimum support not entered");
 
-            this->setCursor(Qt::ArrowCursor);
+            setCursor(Qt::ArrowCursor);
             ui->gridRunAlgorithmButton->setDisabled(false);
 
             return;
@@ -101,22 +108,13 @@ void MainWindow::gridOnRunAlgorithmClicked()
             if(minSup <= 0 || minSup > 1) {
                 QMessageBox::critical(this, "Error", "Minimum support must be in scope (0, 1]");
 
-                this->setCursor(Qt::ArrowCursor);
+                setCursor(Qt::ArrowCursor);
                 ui->gridRunAlgorithmButton->setDisabled(false);
 
                 return;
             }
 
-            if(ui->gridGraphicsView->scene() != nullptr) {
-                delete ui->gridGraphicsView->scene();
-            }
-
-            gridScene = new QGraphicsScene();
-            gridScene->setSceneRect(0, 0, 800, 600);
-            ui->gridGraphicsView->setScene(gridScene);
-            ui->gridGraphicsView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-            gridTab->onRunAlgorithmClicked(gridScene, minSup);
+            _gridTab->onRunAlgorithmButtonClicked(_gridScene, minSup);
         } else {
             QMessageBox::critical(this, "Error", "Minimum support must be number (float or integer)");
         }
@@ -124,7 +122,7 @@ void MainWindow::gridOnRunAlgorithmClicked()
         QMessageBox::critical(this, "Error", "Minimum support not entered");
     }
 
-    this->setCursor(Qt::ArrowCursor);
+    setCursor(Qt::ArrowCursor);
     ui->gridRunAlgorithmButton->setDisabled(false);
 }
 
@@ -132,6 +130,6 @@ void MainWindow::gridOnRunAlgorithmClicked()
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete gridTab;
-    delete gridScene;
+    delete _gridTab;
+    delete _gridScene;
 }
