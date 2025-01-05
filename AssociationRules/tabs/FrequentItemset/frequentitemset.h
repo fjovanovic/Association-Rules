@@ -8,6 +8,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 #include <QMap>
+#include <QTextEdit>
+#include <QDesktopServices>
 
 
 class FrequentItemset
@@ -15,6 +17,9 @@ class FrequentItemset
 public:
     // Constructors
     FrequentItemset();
+
+    // Destructors
+    ~FrequentItemset();
 
     // Getters
     QString getInputFilePath();
@@ -33,6 +38,7 @@ private:
     QString _inputOpenFilePath;
     QString _outputOpenFilePath;
     int _nodeRadius;
+    QTextEdit *_editor;
     QMap<QVector<int>, int> _nodesSupport;
     QVector<QVector<int>> _transactions;
     QMap<int, int> _itemsFrequencies;
@@ -46,10 +52,6 @@ private:
     double _minSupport;
     QMap<QVector<int>, int> _frequentItemsets;
 
-
-    QMap<int, QString> toLetter;
-
-
     // Functions
     bool readFile();
     void findItemFrequencies();
@@ -59,6 +61,8 @@ private:
     void findChildren();
     bool childExists(const QVector<QVector<int>> &childrenList, const QVector<int> &child);
     void drawTree(QGraphicsScene *scene);
+    void saveFile(const QVector<QVector<int>> &frequentItemsets);
 };
+
 
 #endif // FREQUENTITEMSET_H

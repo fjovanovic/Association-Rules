@@ -7,21 +7,22 @@ FrequentItemset::FrequentItemset()
     QString absoluteRootPath = QDir(projectRoot).absolutePath();
 
     _inputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/";
-    // _inputOpenFilePath = "/home/filip/Desktop";
     _outputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/";
-    // _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/input.txt";
-    _inputFilePath = "/home/filip/Desktop/input.txt";
-    // _inputFilePath = "/home/filip/Desktop/input.txt";
+    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/input4_10000.txt";
     _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/output.txt";
 
     _nodeRadius = 25;
 
+    _editor = new QTextEdit(nullptr);
+    _editor->setReadOnly(true);
+    _editor->setWindowTitle("Frequent Itemset");
+    _editor->resize(400, 800);
+}
 
-    toLetter.insert(1, "A");
-    toLetter.insert(2, "B");
-    toLetter.insert(3, "C");
-    toLetter.insert(4, "D");
-    toLetter.insert(5, "E");
+
+FrequentItemset::~FrequentItemset()
+{
+    delete _editor;
 }
 
 
@@ -84,6 +85,9 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     _setsFrequencies.clear();
     _childrenMap.clear();
     _pendingRemovalEllipses.clear();
+    _frequentItemsets.clear();
+    _nodesSupport.clear();
+    _nodePositions.clear();
     _removalColoring = true;
 
     bool readFileSuccess = readFile();
@@ -114,201 +118,110 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
     }
 
     if(_currentChildrenMap.size() == 0) {
-        qDebug() << "FREQUENT ITEMSETS:";
-        for(auto it = _frequentItemsets.begin(); it != _frequentItemsets.end(); it++) {
-            QVector<int> node = it.key();
-            int support = it.value();
-            QString row = "[";
-            for(int item : node) {
-                row += toLetter[item] + ", ";
+        QVector<QVector<int>> frequentItemsetVector = _frequentItemsets.keys();
+        std::sort(frequentItemsetVector.begin(), frequentItemsetVector.end(),
+            [](const QVector<int> &a, const QVector<int> &b) {
+                if(a.size() == b.size()) {
+                    return a < b;
+                }
+
+                return a.size() < b.size();
             }
-            row = row.removeLast().removeLast() + "]: " + QString::number(support);
-            qDebug() << row;
-        }
+        );
+
+        saveFile(frequentItemsetVector);
 
         return;
-
-
-        // QMessageBox::critical(nullptr, "Error", "No more nodes to remove");
-        // return;
     }
-    qDebug() << "---------------------------BEGIN---------------------------";
 
-    // Finding nodes to remove at max depth with with lowest frequency
     int maxDepth = 0;
-    for(const auto &key : _currentChildrenMap.keys()) {
-        int keySize = key.size();
+    for(auto it = _currentChildrenMap.cbegin(); it != _currentChildrenMap.cend(); it++) {
+        int keySize = it.key().size();
         maxDepth = std::max(maxDepth, keySize);
     }
 
     QVector<QVector<int>> deepestNodes;
-    for(const auto &key : _currentChildrenMap.keys()) {
-        if(key.size() == maxDepth) {
-            deepestNodes.append(key);
+    for(auto it = _currentChildrenMap.cbegin(); it != _currentChildrenMap.cend(); it++) {
+        if(it.key().size() == maxDepth) {
+            deepestNodes.append(it.key());
         }
     }
 
     QVector<int> nodeToRemove;
     int minFrequency = INT_MAX;
-    for(const auto &node : deepestNodes) {
-        int frequency = _itemsFrequencies.value(node.last(), INT_MAX);
+    for(auto it = deepestNodes.cbegin(); it != deepestNodes.cend(); it++) {
+        int frequency = _itemsFrequencies.value(it->last(), INT_MAX);
         if(frequency < minFrequency) {
             minFrequency = frequency;
-            nodeToRemove = node;
+            nodeToRemove = *it;
         }
     }
 
     QVector<QVector<int>> nodesToRemove;
-    for(const auto &key : _currentChildrenMap.keys()) {
-        if(key.last() == nodeToRemove.last() && _currentChildrenMap.value(key).isEmpty()) {
-            nodesToRemove.append(key);
+    for(auto it = _currentChildrenMap.cbegin(); it != _currentChildrenMap.cend(); it++) {
+        if(it.key().last() == nodeToRemove.last() && it.value().isEmpty()) {
+            nodesToRemove.append(it.key());
         }
     }
 
-    int endingItem = nodesToRemove.last().last();
-
-    // 1. Get paths to the leaf nodes
+    QString message = "Paths:\n";
     QMap<QVector<int>, int> paths;
     for(QVector<int> &node : nodesToRemove) {
         paths[node] = _nodesSupport[node];
-    }
 
-    qDebug() << "Paths:";
-    for(auto it = paths.begin(); it != paths.end(); it++) {
-        QVector<int> key = it.key();
-        int val = it.value();
-
-        QString row = "";
-        for(int node : key) {
-            row += toLetter[node];
+        for(int i : node) {
+            message += QString::number(i);
         }
-        row += ": " + QString::number(val);
-        qDebug() << row;
+        message += "\n";
     }
 
-
-    // 2. Count of each item in paths
-    QMap<int, int> countItem;
-    for(auto it = paths.begin(); it != paths.end(); it++) {
-        QVector<int> key = it.key();
-        for(int node : key) {
-            countItem[node] += _itemsFrequencies[node];
-        }
-    }
-
-    // TODO: ovde dodaj iteme u string za ispis fajla, i ako neki ne zadovoljava uslov minSupport ispisi nesto pored njega
-
-    qDebug() << "Count items:";
-    for(auto it = countItem.begin(); it != countItem.end(); ) {
-        int key = it.key();
-        double support = static_cast<double>(it.value());
-        qDebug() << toLetter[key] << ": " << QString::number(support);
-        if(_minSupport - support > 0.001) {
-            it = countItem.erase(it);
-        } else {
-            it++;
-        }
-    }
-
-    // 3. Generate candidates and calculate their support
-    QVector<int> pathItems = countItem.keys();
     QVector<QVector<int>> candidates;
+    int lastElement = nodeToRemove.last();
+    QVector<QVector<int>> nodesToRemoveCopy = nodesToRemove;
+    message += "\nCandidates:\n";
+    for(int i = 0; i < nodesToRemoveCopy.size(); i++) {
+        nodesToRemoveCopy[i].pop_back();
 
-    // int numCombinations = 1 << pathItems.size();
+        int nodeSize = nodesToRemoveCopy[i].size();
+        int numCombinations = pow(2, nodeSize);
+        for(int j = 0; j < numCombinations; j++) {
+            QVector<int> combination;
+            for(int k = 0; k < nodeSize; k++) {
+                if(j & (1 << k)) {
+                    combination.push_back(nodesToRemoveCopy[i][k]);
+                }
+            }
 
-    // for(int mask = 1; mask < numCombinations; mask++) {
-    //     QVector<int> combination;
+            combination.push_back(lastElement);
 
-    //     for(int i = 0; i < pathItems.size(); i++) {
-    //         if(mask & (1 << i)) {
-    //             combination.append(pathItems[i]);
-    //         }
-    //     }
-
-    //     if(!combination.isEmpty() && combination.last() == endingItem) {
-    //         candidates.append(combination);
-    //     }
-    // }
-    QString nodeTxt = "Node to remove: ";
-    for(int i : nodeToRemove) {
-        nodeTxt += toLetter[i];
-    }
-    qDebug() << nodeTxt;
-    // if(nodeToRemove.size() > 0) {
-    //     candidates.append(QVector<int>({endingItem}));
-    // }
-
-
-    int lastElement = nodeToRemove.last(); // Poslednji element
-
-    // // Iteriraj kroz početne pozicije niza
-    // for (int start = 0; start < nodeToRemove.size(); ++start) {
-    //     QVector<int> current;
-
-    //     // Proširuj podniz počevši od trenutne pozicije
-    //     for (int i = start; i < nodeToRemove.size(); ++i) {
-    //         current.append(nodeToRemove[i]);
-
-    //         // Dodaj samo podnizove koji se završavaju poslednjim elementom
-    //         if (current.last() == lastElement) {
-    //             candidates.append(current);
-    //         }
-    //     }
-    // }
-
-
-
-    for(int i = 0; i < nodesToRemove.size(); i++) {
-        // candidates.append(nodesToRemove.last().last());
-        for (int j = 0; j < nodeToRemove.size() - 1; j++) {
-            QVector<int> current;
-
-            // Dodajemo elemente od trenutne pozicije do kraja niza
-            for (int k = j; k < nodeToRemove.size() - 1; ++j) {
-                current.append(nodeToRemove[k]);
-                QVector<int> nodeToAdd = current;
-                nodeToAdd.append(lastElement);
-
-                // Dodaj trenutnu kombinaciju u rezultat
-                candidates.append(nodeToAdd);
+            auto foundIt = std::find(candidates.begin(), candidates.end(), combination);
+            if(foundIt == candidates.end()) {
+                candidates.push_back(combination);
+                QVector<int> sortedCombination = combination;
+                std::sort(sortedCombination.begin(), sortedCombination.end());
+                message += "{";
+                for(int i : combination) {
+                    message += QString::number(i) + ", ";
+                }
+                message = message.removeLast().removeLast() + "}  #SUP: " + QString::number(_setsFrequencies[sortedCombination]) + "\n";
             }
         }
     }
 
-    // QMap<QVector<int>, int> candidatesSupport;
-    // for(const QVector<int> &transaction : _sortedTransactions) {
-    //     for(const QVector<int> &candidate : candidates) {
-    //         bool isIncluded = std::includes(transaction.begin(), transaction.end(), candidate.begin(), candidate.end());
-    //         if(isIncluded) {
-    //             candidatesSupport[candidate]++;
-    //         }
-    //     }
-    // }
-
-    qDebug() << "Candidates:";
-    for(QVector<int> set : candidates) {
-        QString row = "[";
-        for(int i : set) {
-            row += toLetter[i] + ", ";
-        }
-        row = row.removeLast().removeLast() + "]: " + QString::number(_setsFrequencies[set]);
-        qDebug() << row;
-    }
-
-    qDebug() << "Frequent itemsets:";
-    for(QVector<int> set : candidates) {
-        QString row = "[";
-        for(int i : set) {
-            row += toLetter[i] + ", ";
-        }
-        row = row.removeLast().removeLast() + "]: " + QString::number(_setsFrequencies[set]);
-        if(_minSupport - _setsFrequencies[set] < 0.001) {
-            qDebug() << row;
-            _frequentItemsets[set] = _setsFrequencies[set];
+    message += "\nFrequent itemsets:\n";
+    for(QVector<int> &set : candidates) {
+        QVector<int> sortedSet = set;
+        std::sort(sortedSet.begin(), sortedSet.end());
+        auto foundIt = _frequentItemsets.find(sortedSet);
+        if((_minSupport - _setsFrequencies[sortedSet] < 0.001) && foundIt == _frequentItemsets.end()) {
+            message += "{";
+            for(int i : set) {
+                message += QString::number(i) + ", ";
+            }
+            message = message.removeLast().removeLast() + "}  #SUP: " + QString::number(_setsFrequencies[sortedSet]) + "\n";
+            _frequentItemsets[sortedSet] = _setsFrequencies[sortedSet];
         }
     }
-
-    qDebug() << "--------------------------------------------------------";
 
     if(_removalColoring) {
         for(const auto &node : nodesToRemove) {
@@ -345,7 +258,7 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
                 _nodeRadius * 2, _nodeRadius * 2,
                 QPen(Qt::black), QBrush(Qt::red)
             );
-            QString nodeText = toLetter[node.last()] + ": " + QString::number(_nodesSupport[node]);
+            QString nodeText = QString::number(node.last()) + ": " + QString::number(_nodesSupport[node]);
             QGraphicsTextItem *text = scene->addText(nodeText);
             QFont font = text->font();
             font.setPointSize(7);
@@ -357,6 +270,9 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
             text->setDefaultTextColor(Qt::black);
             _pendingRemovalEllipses.append(ellipse);
         }
+
+        _editor->setText(message);
+        _editor->show();
 
         _removalColoring = false;
     } else {
@@ -494,17 +410,6 @@ void FrequentItemset::findSetsFrequencies()
 
         _setsFrequencies[combination] = count;
     }
-
-    // for(auto it = _setsFrequencies.begin(); it != _setsFrequencies.end(); it++) {
-    //     QVector<int> tr = it.key();
-    //     int supp = it.value();
-    //     QString row = "[";
-    //     for(int item : tr) {
-    //         row += toLetter[item] + ", ";
-    //     }
-    //     row = row.removeLast().removeLast() + "]: " + QString::number(supp);
-    //     qDebug() << row;
-    // }
 }
 
 
@@ -530,12 +435,6 @@ void FrequentItemset::findChildren()
 
         for(int item : transaction) {
             current.push_back(item);
-            // QString currentStr = "Ubacujem roditelja: [";
-            // for(int i : current) {
-            //     currentStr += toLetter[i] + ", ";
-            // }
-            // currentStr = currentStr.removeLast().removeLast() + "]";
-            // qDebug() << currentStr;
 
             if(_childrenMap.find(current) == _childrenMap.end()) {
                 _childrenMap[current] = {};
@@ -547,44 +446,10 @@ void FrequentItemset::findChildren()
 
                 if(!childExists(_childrenMap[current], child)) {
                     _childrenMap[current].push_back(child);
-
-                    // QString row = "Ubacujem dete: [";
-                    // for(int i : child) {
-                    //     row += toLetter[i] + ", ";
-                    // }
-                    // row = row.removeLast().removeLast() + "]";
-                    // qDebug() << row;
                 }
             }
         }
     }
-
-    // qDebug() << "Deca nakon unosa";
-
-    // for (auto it = _childrenMap.begin(); it != _childrenMap.end(); ++it) {
-    //     const QVector<int> &key = it.key();
-    //     const QVector<QVector<int>> &value = it.value();
-
-    //     // Ispis ključa
-    //     QString keyString = "Key: [";
-    //     for (int item : key) {
-    //         keyString += toLetter[item] + " ";
-    //     }
-    //     keyString += "]";
-
-    //     qDebug() << keyString;
-
-    //     // Ispis vrednosti
-    //     qDebug() << "  Children:";
-    //     for (const QVector<int> &child : value) {
-    //         QString childString = "    [";
-    //         for (int item : child) {
-    //             childString += toLetter[item] + " ";
-    //         }
-    //         childString += "]";
-    //         qDebug() << childString;
-    //     }
-    // }
 }
 
 
@@ -640,38 +505,8 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
         }
     }
 
-    // for (auto it = _nodesSupport.begin(); it != _nodesSupport.end(); ++it) {
-    //     QVector<int> &key = const_cast<QVector<int>&>(it.key());
-
-    //     // Sortiraj elemente ključa u mestu prema _itemsFrequencies
-    //     std::sort(key.begin(), key.end(),
-    //         [this](int a, int b) {
-    //             return _itemsFrequencies.value(a, 0) > _itemsFrequencies.value(b, 0);
-    //         }
-    //     );
-    // }
-
-    // qDebug() << "nodesSupport posle sortiranja:";
-    // for(auto it = _nodesSupport.begin(); it != _nodesSupport.end(); ++it) {
-    //     QString row = "[";
-    //     QVector<int> tr = it.key();
-    //     int supp = it.value();
-    //     for(int i : tr) {
-    //         row += toLetter[i] + ", ";
-    //     }
-    //     row = row.removeLast().removeLast() + "]: " + QString::number(supp);
-    //     qDebug() << row;
-    // }
-    // for
-    // std::sort(
-    //     _nodesSupport.begin(), _nodesSupport.end(),
-    //     [this](int a, int b) {
-    //         return _itemsFrequencies.value(a, 0) > _itemsFrequencies.value(b, 0);
-    //     }
-    // );
-
     maxWidth *= 100;
-    const int levelHeight = 130;
+    int levelHeight = 130;
     int currentY = 0;
 
     QPointF rootPos(maxWidth / 2.0, currentY);
@@ -698,13 +533,11 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
 
         QVector<QPointF> positions;
 
-        // Raspodela čvorova na nivou
         for(int i = 0; i < nodeCount; i++) {
             double xPosition = (maxWidth / static_cast<double>(nodeCount)) * (i + 0.5);
             positions.append(QPointF(xPosition, currentY));
         }
 
-        // Sačuvaj pozicije za čvorove trenutnog nivoa
         int index = 0;
         for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
             const QVector<int> &childKey = it.key();
@@ -716,7 +549,6 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
             }
         }
 
-        // Nacrtaj čvorove za trenutni nivo
         for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
             const QVector<int> &childKey = it.key();
             if(childKey.size() == level) {
@@ -727,16 +559,7 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
                     QPen(Qt::black), QBrush(Qt::white)
                 );
 
-                // Dodaj tekst sa poslednjim elementom ključa
-                // QString nodeText = QString::number(childKey.last()) + ": " + QString::number(_setsFrequencies[childKey]);
-                // QString itemStr = "[";
-                // for(int i : childKey) {
-                //     itemStr += toLetter[i] + ", ";
-                // }
-                // itemStr = itemStr.removeLast().removeLast() + "] : " + QString::number(_nodesSupport[childKey]);
-                // qDebug() << "Crtam: " << itemStr;
-                // QVector<int>
-                QString nodeText = toLetter[childKey.last()] + ": " + QString::number(_nodesSupport[childKey]);
+                QString nodeText = QString::number(childKey.last()) + ": " + QString::number(_nodesSupport[childKey]);
                 QGraphicsTextItem *text = scene->addText(nodeText);
                 QFont font = text->font();
                 font.setPointSize(7);
@@ -783,5 +606,43 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
                 );
             }
         }
+    }
+}
+
+
+void FrequentItemset::saveFile(const QVector<QVector<int>> &frequentItemsets)
+{
+    QFile file(_outputFilePath);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(nullptr, "Error", "Unable to open the output file");
+        return;
+    }
+
+    QTextStream out(&file);
+    QString message = "";
+    const int itemsetWidth = 20;
+    const int supportWidth = 30;
+
+    for(QVector<int> set : frequentItemsets) {
+        int support = _frequentItemsets[set];
+        double supportPerc = static_cast<double>(support) / _sortedTransactions.size() * 100;
+        message = "{";
+        for(int num : set) {
+            message += QString::number(num) + ", ";
+        }
+        message = message.removeLast().removeLast() + "}";
+
+        out << message.leftJustified(itemsetWidth)
+            << QString("#SUP: %1 (%2%)")
+               .arg(support)
+               .arg(supportPerc)
+               .leftJustified(supportWidth)
+            << "\n";
+    }
+
+    file.close();
+
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFilePath))) {
+        QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
     }
 }
