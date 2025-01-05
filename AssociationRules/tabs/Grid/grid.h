@@ -29,7 +29,7 @@ public:
     // Slots
     QString onBrowseButtonClicked();
     QString onChangeButtonClicked();
-    void onRunAlgorithmClicked(QGraphicsScene *scene, const double minSupport);
+    void onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport);
 
 private:
     // Fields
@@ -44,7 +44,7 @@ private:
     QString _outputFilePath;
     QString _inputOpenFilePath;
     QString _outputOpenFilePath;
-    QVector<QVector<int>> transactions;
+    QVector<QVector<int>> _transactions;
 
     // Functions
     bool readFile(QSet<int> &gridItems);

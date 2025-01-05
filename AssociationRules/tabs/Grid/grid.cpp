@@ -72,9 +72,10 @@ QString Grid::onChangeButtonClicked()
 }
 
 
-void Grid::onRunAlgorithmClicked(QGraphicsScene *scene, const double minSupport)
+void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport)
 {
-    transactions.clear();
+    _transactions.clear();
+    scene->clear();
     QSet<int> gridItems;
 
     bool readFileSuccess = readFile(gridItems);
@@ -153,7 +154,7 @@ bool Grid::readFile(QSet<int> &gridItems)
         }
 
         std::sort(transaction.begin(), transaction.end());
-        transactions.append(transaction);
+        _transactions.append(transaction);
     }
 
     file.close();
@@ -197,7 +198,7 @@ QVector<int> Grid::findAllSupports(const QVector<QVector<int>> &gridSets)
     QVector<int> supports;
     for(const QVector<int> &set : gridSets) {
         int count = 0;
-        for(const QVector<int> &transaction : transactions) {
+        for(const QVector<int> &transaction : _transactions) {
             bool contains = true;
             for(int item : set) {
                 if(!transaction.contains(item)) {
@@ -245,14 +246,14 @@ QMap<QVector<int>, int> Grid::generateFrequentItemsets(const double minSupport)
 {
     QMap<QVector<int>, int> frequentItemsets;
 
-    for(QVector<int> &transaction : transactions) {
+    for(QVector<int> &transaction : _transactions) {
         QVector<QVector<int>> subsets = generateSubsets(transaction);
         for(const QVector<int> &subset : subsets) {
             frequentItemsets[subset]++;
         }
     }
 
-    double transactionsSize = transactions.size();
+    double transactionsSize = _transactions.size();
     for(auto it = frequentItemsets.begin(); it != frequentItemsets.end(); ) {
         if((it.value() / transactionsSize) < minSupport) {
             it = frequentItemsets.erase(it);
@@ -412,7 +413,7 @@ void Grid::drawGrid(
                 setText->setPos(x - setText->boundingRect().width() / 2, y - setText->boundingRect().height() / 2 - 5);
                 setText->setDefaultTextColor(Qt::black);
 
-                double supportPerc = (gridSupports[index] / static_cast<double>(transactions.size())) * 100;
+                double supportPerc = (gridSupports[index] / static_cast<double>(_transactions.size())) * 100;
                 QString supportStr = "(" + QString::number(supportPerc) + " %)";
                 QGraphicsTextItem *supportText = scene->addText(supportStr);
                 supportText->setFont(font);
@@ -472,7 +473,7 @@ bool Grid::saveFile(
             continue;
 
         int support = pair.second;
-        double supportPerc = static_cast<double>(support) / transactions.size() * 100;
+        double supportPerc = static_cast<double>(support) / _transactions.size() * 100;
 
         QString category;
         if (closedAndMaximalItemsets.contains(itemset)) {
