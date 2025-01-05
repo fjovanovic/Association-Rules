@@ -8,6 +8,7 @@
 #include <QGraphicsView>
 
 #include "tabs/Grid/grid.h"
+#include "tabs/FrequentItemset/frequentitemset.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -29,11 +30,21 @@ public slots:
     void gridOnChangeButtonClicked();
     void gridOnRunAlgorithmButtonClicked();
 
+    void freqOnBrowseButtonClicked();
+    void freqOnChangeButtonClicked();
+    void freqOnRunAlgorithmButtonClicked();
+    void freqOnForwardButtonClicked();
+
 private:
     Ui::MainWindow *ui;
     Grid *_gridTab;
     QGraphicsScene *_gridScene;
+    FrequentItemset *_frequentItemsetTab;
+    QGraphicsScene *_frequentItemsetScene;
 
     void gridConfig();
+    void frequentItemsetConfig();
 };
+
+
 #endif // MAINWINDOW_H
