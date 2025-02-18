@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -22,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->freqChangeButton, &QPushButton::clicked, this, &MainWindow::freqOnChangeButtonClicked);
     connect(ui->freqRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::freqOnRunAlgorithmButtonClicked);
     connect(ui->freqForwardButton, &QPushButton::clicked, this, &MainWindow::freqOnForwardButtonClicked);
+    connect(ui->pbChooseVec1, &QPushButton::clicked, this, &MainWindow::pbChooseVector1);
+    connect(ui->pbChooseVec2, &QPushButton::clicked, this, &MainWindow::pbChooseVector2);
+    connect(ui->pbCompute, &QPushButton::clicked, this, &MainWindow::pbCompute);
 }
 
 
@@ -185,6 +189,130 @@ void MainWindow::frequentItemsetConfig()
     ui->freqGraphicsView->setScene(_frequentItemsetScene);
 }
 
+double MainWindow::minkowskiDistance(const QVector<double> &vec1, const QVector<double> &vec2, double p)
+{
+    if (vec1.size() != vec2.size()) {
+        throw std::invalid_argument("Vectors must have the same dimension.");
+    }
+
+    double sum = 0.0;
+    for (int i = 0; i < vec1.size(); ++i) {
+        sum += std::pow(std::abs(vec1[i] - vec2[i]), p);
+
+    }
+    return std::pow(sum, 1.0 / p);
+}
+
+double MainWindow::mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2, const QVector<QVector<double> > &covMatrix)
+{
+    if (vec1.size() != vec2.size()) {
+        throw std::invalid_argument("Vectors must have the same dimension.");
+    }
+    if (covMatrix.size() != vec1.size() || covMatrix[0].size() != vec1.size()) {
+        throw std::invalid_argument("Covariance matrix dimensions must match vector size.");
+    }
+
+    QVector<double> diff(vec1.size());
+    for (int i = 0; i < vec1.size(); ++i) {
+        diff[i] = vec1[i] - vec2[i];
+    }
+
+    QVector<double> temp(vec1.size(), 0.0);
+    for (int i = 0; i < vec1.size(); ++i) {
+        for (int j = 0; j < vec1.size(); ++j) {
+            temp[i] += diff[j] * covMatrix[j][i];
+        }
+    }
+
+    double distance = 0.0;
+    for (int i = 0; i < vec1.size(); ++i) {
+        distance += temp[i] * diff[i];
+    }
+
+    return std::sqrt(distance);
+}
+
+double MainWindow::cosineDistance(const QVector<double> &vec1, const QVector<double> &vec2)
+{
+    if (vec1.size() != vec2.size()) {
+        qWarning() << "Vektori nisu iste duzine!";
+        return -1.0;  // Greška
+    }
+
+    // Skalarni proizvod vektora
+    double dotProduct = 0.0;
+    for (int i = 0; i < vec1.size(); ++i) {
+        dotProduct += vec1[i] * vec2[i];
+    }
+
+    // Norme vektora
+    double normVec1 = 0.0;
+    double normVec2 = 0.0;
+    for (int i = 0; i < vec1.size(); ++i) {
+        normVec1 += vec1[i] * vec1[i];
+        normVec2 += vec2[i] * vec2[i];
+    }
+
+    normVec1 = std::sqrt(normVec1);
+    normVec2 = std::sqrt(normVec2);
+
+    // Kosinusna sličnost
+    double cosineSimilarity = dotProduct / (normVec1 * normVec2);
+
+    // Kosinusno rastojanje
+    double cosineDistance = 1.0 - cosineSimilarity;
+
+    return cosineDistance;
+}
+
+int MainWindow::hammingDistance(const QVector<double> &vec1, const QVector<double> &vec2)
+{
+    if (vec1.size() != vec2.size()) {
+        qWarning() << "Vektori nisu iste duzine!";
+        return -1;  // Greška
+    }
+
+    int distance = 0;
+    for (int i = 0; i < vec1.size(); ++i) {
+        // Pretpostavljamo da su vrednosti 0 ili 1, pa samo proveravamo razliku
+        if (vec1[i] != vec2[i]) {
+            distance++;  // Povećaj rastojanje ako su vrednosti različite
+        }
+    }
+
+    return distance;
+}
+
+QVector<double> MainWindow::parseVector(const QString &filePath)
+{
+    QVector<double> vector;
+    QFile file(filePath);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Error opening file:" << filePath;
+        return vector;
+    }
+
+    QTextStream stream(&file);
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        QStringList numbers = line.split(",");
+        for (const QString& num : numbers) {
+            bool ok;
+            double value = num.toDouble(&ok);
+            qDebug()<<value;
+            if (ok) {
+                vector.append(value);
+            } else {
+                qWarning() << "Failed to parse number:" << num;
+            }
+        }
+    }
+
+    file.close();
+    return vector;
+}
+
 
 void MainWindow::freqOnBrowseButtonClicked()
 {
@@ -249,6 +377,46 @@ void MainWindow::freqOnForwardButtonClicked()
     setCursor(Qt::WaitCursor);
     _frequentItemsetTab->onForwardButtonClicked(_frequentItemsetScene);
     setCursor(Qt::ArrowCursor);
+}
+
+void MainWindow::pbChooseVector1()
+{
+    QString filePath = _frequentItemsetTab->onBrowseButtonClicked();
+    ui->leVec1->setText(filePath);
+}
+
+void MainWindow::pbChooseVector2()
+{
+    QString filePath = _frequentItemsetTab->onBrowseButtonClicked();
+    ui->leVec2->setText(filePath);
+}
+
+void MainWindow::pbCompute()
+{
+    QString dist = ui->comboBox->currentText();
+    QString path1 = ui->leVec1->text();
+    QString path2 = ui->leVec2->text();
+    QVector<double> vec1 = MainWindow::parseVector(path1);
+    QVector<double> vec2 = MainWindow::parseVector(path2);
+    ui->label->setText(QString::number(vec1[0]));
+    double p = ui->leParam->text().toDouble();
+    if (dist == "Minkowski Distance"){
+        double res = MainWindow::minkowskiDistance(vec1, vec2, p);
+        ui->leRes->setText(QString::number(res));
+    }
+    if (dist == "Mahalanobis Distance"){
+
+    }
+    if (dist == "Cosine Distance"){
+        double res = MainWindow::cosineDistance(vec1, vec2);
+        ui->leRes->setText(QString::number(res));
+    }
+    if (dist == "Hamming Distance"){
+        int res = MainWindow::hammingDistance(vec1, vec2);
+        ui->leRes->setText(QString::number(res));
+
+    }
+
 }
 
 

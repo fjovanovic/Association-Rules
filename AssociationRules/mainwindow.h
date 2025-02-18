@@ -6,7 +6,10 @@
 #include <QMessageBox>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-
+#include <QFile>
+#include <QTextStream>
+#include <QVector>
+#include <QStringList>
 #include "tabs/Grid/grid.h"
 #include "tabs/FrequentItemset/frequentitemset.h"
 
@@ -35,6 +38,11 @@ public slots:
     void freqOnRunAlgorithmButtonClicked();
     void freqOnForwardButtonClicked();
 
+    void pbChooseVector1();
+    void pbChooseVector2();
+    void pbCompute();
+
+
 private:
     Ui::MainWindow *ui;
     Grid *_gridTab;
@@ -44,6 +52,13 @@ private:
 
     void gridConfig();
     void frequentItemsetConfig();
+    double minkowskiDistance(const QVector<double> &vec1, const QVector<double> &vec2, double p);
+    double mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2, const QVector<QVector<double>> &covMatrix);
+    double cosineDistance(const QVector<double>& vec1, const QVector<double>& vec2);
+    int hammingDistance(const QVector<double>& vec1, const QVector<double>& vec2);
+
+    QVector<double> parseVector(const QString& filePath);
+
 };
 
 
