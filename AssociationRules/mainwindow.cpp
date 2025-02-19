@@ -26,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pbChooseVec1, &QPushButton::clicked, this, &MainWindow::pbChooseVector1);
     connect(ui->pbChooseVec2, &QPushButton::clicked, this, &MainWindow::pbChooseVector2);
     connect(ui->pbCompute, &QPushButton::clicked, this, &MainWindow::pbCompute);
+    connect(ui->pbChooseApr, &QPushButton::clicked, this, &MainWindow::pbChooseApr);
+
 }
 
 
@@ -417,6 +419,12 @@ void MainWindow::pbCompute()
 
     }
 
+}
+
+void MainWindow::pbChooseApr()
+{
+    QString filePath = _frequentItemsetTab->onBrowseButtonClicked();
+    ui->leApr->setText(filePath);
 }
 
 

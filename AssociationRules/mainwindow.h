@@ -42,6 +42,7 @@ public slots:
     void pbChooseVector2();
     void pbCompute();
 
+    void pbChooseApr();
 
 private:
     Ui::MainWindow *ui;
