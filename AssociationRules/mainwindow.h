@@ -10,8 +10,15 @@
 #include <QTextStream>
 #include <QVector>
 #include <QStringList>
+#include <QCoreApplication>
+#include <QTextStream>
+#include <QHash>
+#include <QStringList>
+#include <QSet>
+#include <QDebug>
 #include "tabs/Grid/grid.h"
 #include "tabs/FrequentItemset/frequentitemset.h"
+
 
 
 QT_BEGIN_NAMESPACE
@@ -43,6 +50,8 @@ public slots:
     void pbCompute();
 
     void pbChooseApr();
+    void pbFindRare();
+
 
 private:
     Ui::MainWindow *ui;
@@ -59,6 +68,10 @@ private:
     int hammingDistance(const QVector<double>& vec1, const QVector<double>& vec2);
 
     QVector<double> parseVector(const QString& filePath);
+
+    void findRareItemsets(const QString &filename);
+
+
 
 };
 

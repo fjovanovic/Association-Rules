@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pbChooseVec2, &QPushButton::clicked, this, &MainWindow::pbChooseVector2);
     connect(ui->pbCompute, &QPushButton::clicked, this, &MainWindow::pbCompute);
     connect(ui->pbChooseApr, &QPushButton::clicked, this, &MainWindow::pbChooseApr);
+    connect(ui->pbFindRare, &QPushButton::clicked, this, &MainWindow::pbFindRare);
 
 }
 
@@ -315,6 +316,62 @@ QVector<double> MainWindow::parseVector(const QString &filePath)
     return vector;
 }
 
+void MainWindow::findRareItemsets(const QString &filename)
+{
+    int MIN_SUPPORT = ui->leMinSupp->text().toInt();
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Ne mogu da otvorim fajl!";
+        return;
+    }
+
+    QTextStream in(&file);
+    QVector<QSet<int>> transactions;
+    QHash<QSet<int>, int> freqMap;
+
+    // 1. Učitavanje transakcija iz fajla
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty()) continue;
+
+        QStringList items = line.split(" ", Qt::SkipEmptyParts);
+        QSet<int> transaction;
+        for (const QString &item : items)
+            transaction.insert(item.toInt());
+
+        transactions.append(transaction);
+    }
+    file.close();
+
+    // 2. Generisanje i brojanje svih podskupova (rekurzivno)
+    for (const auto &transaction : transactions) {
+        QList<int> items = transaction.values();
+        int n = items.size();
+
+        for (int subsetSize = 1; subsetSize <= n; ++subsetSize) {
+            QVector<bool> mask(n, false);
+            for (int i = 0; i < subsetSize; ++i) mask[i] = true;
+
+            do {
+                QSet<int> itemset;
+                for (int i = 0; i < n; ++i)
+                    if (mask[i]) itemset.insert(items[i]);
+
+                freqMap[itemset]++;
+            } while (std::prev_permutation(mask.begin(), mask.end()));
+        }
+    }
+
+    // 3. Ispis retkih skupova
+    qDebug() << "Retki skupovi stavki (pojavljuju se manje od" << MIN_SUPPORT << "puta):";
+    for (auto it = freqMap.begin(); it != freqMap.end(); ++it) {
+        qDebug()<<it.key();
+        if (it.value() < MIN_SUPPORT) {
+            qDebug() << it.key() << " -> Pojavljivanja:" << it.value();
+        }
+    }
+}
+
 
 void MainWindow::freqOnBrowseButtonClicked()
 {
@@ -425,6 +482,11 @@ void MainWindow::pbChooseApr()
 {
     QString filePath = _frequentItemsetTab->onBrowseButtonClicked();
     ui->leApr->setText(filePath);
+}
+
+void MainWindow::pbFindRare()
+{
+    MainWindow::findRareItemsets(ui->leApr->text());
 }
 
 
