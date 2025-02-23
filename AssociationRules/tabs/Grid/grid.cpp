@@ -95,7 +95,7 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     drawGrid(scene, gridSets, childrenMap, gridSupports, frequentKeys, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
 
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
-    QGraphicsRectItem *legendRect = scene->addRect(10 - (_gridWidth / 2), 10, 230, 65, _textPen, legendBrush);
+    QGraphicsRectItem *legendRect = scene->addRect(10 - (_gridWidth / 2), 10, 190, 85, _textPen, legendBrush);
     QGraphicsEllipseItem *closedItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 15, 15, 15, _textPen, _closedItemsetsBrush);
     QGraphicsTextItem *closedItemsetsText = scene->addText("Closed itemsets");
     closedItemsetsText->setPos(30 - (_gridWidth / 2), 10);
@@ -108,6 +108,10 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     QGraphicsTextItem *closedAndMaximalItemsetsText = scene->addText("Closed and maximal itemsets");
     closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 50);
     closedAndMaximalItemsetsText->setDefaultTextColor(Qt::black);
+    QGraphicsEllipseItem *rareItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 75, 15, 15, _textPen, _rareItemsetsBrush);
+    QGraphicsTextItem *rareItemsetsTest = scene->addText("Rare itemsets");
+    rareItemsetsTest->setPos(30 - (_gridWidth / 2), 70);
+    rareItemsetsTest->setDefaultTextColor(Qt::black);
 
     QVector<QPair<QVector<int>, int>> sortedItemsets = sortBySetSize(frequentItemsets);
     bool saveFileSuccess = saveFile(sortedItemsets, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
