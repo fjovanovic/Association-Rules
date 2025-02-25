@@ -8,8 +8,9 @@ Grid::Grid()
 
     _inputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/";
     _outputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/";
-    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/input4_100000.txt";
-    _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output.txt";
+    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/input4_100000_fruit.txt";
+    _outputFrequentFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output_frequent.txt";
+    _outputRareFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output_rare.txt";
 
     _gridWidth = 0;
 
@@ -30,7 +31,7 @@ QString Grid::getInputFilePath()
 
 QString Grid::getOutputFilePath()
 {
-    return _outputFilePath;
+    return _outputFrequentFilePath;
 }
 
 
@@ -63,10 +64,10 @@ QString Grid::onChangeButtonClicked()
     );
 
     if(filePath.isEmpty()) {
-        return _outputFilePath;
+        return _outputFrequentFilePath;
     }
 
-    _outputFilePath = filePath;
+    _outputFrequentFilePath = filePath;
 
     return filePath;
 }
@@ -75,6 +76,7 @@ QString Grid::onChangeButtonClicked()
 void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport)
 {
     _transactions.clear();
+    _itemMap.clear();
     scene->clear();
     QSet<int> gridItems;
 
@@ -113,6 +115,16 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     rareItemsetsTest->setPos(30 - (_gridWidth / 2), 70);
     rareItemsetsTest->setDefaultTextColor(Qt::black);
 
+    int yOffset = 10;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
+    QGraphicsRectItem *legendItemsRect = scene->addRect((_gridWidth / 2) - 110, 10, 100, legentItemsRectHeight, _textPen, legendBrush);
+    for(auto it = _itemMap.begin(); it != _itemMap.end(); ++it) {
+        QString legendText = QString::number(it.key()) + ": " + it.value();
+        QGraphicsTextItem *itemText = scene->addText(legendText);
+        itemText->setPos((_gridWidth / 2) - 110, yOffset);
+        yOffset += 20;
+    }
+
     QVector<QPair<QVector<int>, int>> sortedItemsets = sortBySetSize(frequentItemsets);
     bool saveFileSuccess = saveFile(sortedItemsets, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
     if(!saveFileSuccess) {
@@ -132,6 +144,7 @@ bool Grid::readFile(QSet<int> &gridItems)
     }
 
     QTextStream in(&file);
+    int itemCounter = 1;
     while(!in.atEnd()) {
         QString line = in.readLine().trimmed();
 
@@ -140,15 +153,15 @@ bool Grid::readFile(QSet<int> &gridItems)
             return false;
         }
 
-        QStringList items = line.split(" ", Qt::SkipEmptyParts);
+        QStringList items = line.split(", ", Qt::SkipEmptyParts);
         QVector<int> transaction;
         for(const QString &item : items) {
-            bool isNumber = false;
-            int itemInt = item.toInt(&isNumber);
-
-            if(!isNumber) {
-                QMessageBox::critical(nullptr, "Error", "Invalid input file: Non-numeric value");
-                return false;
+            int itemInt;
+            if(!_itemMap.values().contains(item)) {
+                itemInt = itemCounter++;
+                _itemMap[itemInt] = item;
+            } else {
+                itemInt = _itemMap.key(item);
             }
 
             if(!gridItems.contains(itemInt)) {
@@ -162,7 +175,6 @@ bool Grid::readFile(QSet<int> &gridItems)
     }
 
     file.close();
-
     return true;
 }
 
@@ -460,7 +472,7 @@ bool Grid::saveFile(
     const QVector<QVector<int>> &closedAndMaximalItemsets
 )
 {
-    QFile file(_outputFilePath);
+    QFile file(_outputFrequentFilePath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(nullptr, "Error", "Unable to open the output file");
         return false;
@@ -507,7 +519,7 @@ bool Grid::saveFile(
 
     file.close();
 
-    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFilePath))) {
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFrequentFilePath))) {
         QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
         return false;
     }

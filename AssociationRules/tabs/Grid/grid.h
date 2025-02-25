@@ -12,6 +12,7 @@
 #include <QBrush>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsTextItem>
+#include <QMap>
 
 #include <cmath>
 
@@ -41,10 +42,12 @@ private:
     QBrush _rareItemsetsBrush;
     QPen _textPen;
     QString _inputFilePath;
-    QString _outputFilePath;
+    QString _outputFrequentFilePath;
+    QString _outputRareFilePath;
     QString _inputOpenFilePath;
     QString _outputOpenFilePath;
     QVector<QVector<int>> _transactions;
+    QMap<int, QString> _itemMap;
 
     // Functions
     bool readFile(QSet<int> &gridItems);
