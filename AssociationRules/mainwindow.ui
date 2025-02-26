@@ -46,13 +46,13 @@
            <widget class="QLabel" name="gridInputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
@@ -107,23 +107,23 @@
            <widget class="QLabel" name="gridOutputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
             <property name="text">
-             <string>Output file:</string>
+             <string>Frequent items output file:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="gridOutputFileLine">
+           <widget class="QLineEdit" name="gridFrequentOutputFileLine">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -142,7 +142,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="gridChangeButton">
+           <widget class="QPushButton" name="gridChangeFrequentOutputButton">
             <property name="minimumSize">
              <size>
               <width>120</width>
@@ -163,6 +163,67 @@
          </layout>
         </item>
         <item row="2" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Rare items output file:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="gridRareOutputFileLine">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="gridChangeRareOutputButton">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Change</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>6</number>
@@ -171,13 +232,13 @@
            <widget class="QLabel" name="gridSetParametersLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
@@ -267,7 +328,7 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="sizeConstraint">
            <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
@@ -288,13 +349,13 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
@@ -368,7 +429,7 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <widget class="QGraphicsView" name="gridGraphicsView">
           <property name="styleSheet">
            <string notr="true">background-color: #2F2F2F;</string>

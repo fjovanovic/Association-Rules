@@ -26,8 +26,11 @@ public:
 
 public slots:
     void gridOnBrowseButtonClicked();
-    void gridOnChangeButtonClicked();
+    void gridOnChangeFrequentButtonClicked();
+    void gridOnChangeRareButtonClicked();
     void gridOnRunAlgorithmButtonClicked();
+    void gridOnFrequentItemsButtonClicked();
+    void gridOnRareItemsButtonClicked();
 
 private:
     Ui::MainWindow *ui;

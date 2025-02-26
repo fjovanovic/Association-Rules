@@ -12,17 +12,22 @@ MainWindow::MainWindow(QWidget *parent)
     MainWindow::gridConfig();
 
     connect(ui->gridBrowseButton, &QPushButton::clicked, this, &MainWindow::gridOnBrowseButtonClicked);
-    connect(ui->gridChangeButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeButtonClicked);
+    connect(ui->gridChangeFrequentOutputButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeFrequentButtonClicked);
+    connect(ui->gridChangeRareOutputButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeRareButtonClicked);
     connect(ui->gridRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::gridOnRunAlgorithmButtonClicked);
+    connect(ui->gridFrequentItemsButton, &QPushButton::clicked, this, &MainWindow::gridOnFrequentItemsButtonClicked);
+    connect(ui->gridRareItemsButton, &QPushButton::clicked, this, &MainWindow::gridOnRareItemsButtonClicked);
 }
 
 
 void MainWindow::gridConfig()
 {
     QString inputFilePath = _gridTab->getInputFilePath();
-    QString outputFilePath = _gridTab->getOutputFilePath();
+    QString outputFrequentFilePath = _gridTab->getFrequentOutputFilePath();
+    QString outputRareFilePath = _gridTab->getRareOutputFilePath();
     ui->gridInputFileLine->setText(inputFilePath);
-    ui->gridOutputFileLine->setText(outputFilePath);
+    ui->gridFrequentOutputFileLine->setText(outputFrequentFilePath);
+    ui->gridRareOutputFileLine->setText(outputRareFilePath);
 
     QTableWidgetItem *headerItem1 = new QTableWidgetItem(QString("Parameter"), QTableWidgetItem::Type);
     ui->gridParametersTable->setHorizontalHeaderItem(0, headerItem1);
@@ -76,10 +81,16 @@ void MainWindow::gridOnBrowseButtonClicked()
 }
 
 
-void MainWindow::gridOnChangeButtonClicked()
+void MainWindow::gridOnChangeFrequentButtonClicked()
 {
-    QString filePath = _gridTab->onChangeButtonClicked();
-    ui->gridOutputFileLine->setText(filePath);
+    QString filePath = _gridTab->onChangeFrequentButtonClicked();
+    ui->gridFrequentOutputFileLine->setText(filePath);
+}
+
+void MainWindow::gridOnChangeRareButtonClicked()
+{
+    QString filePath = _gridTab->onChangeRareButtonClicked();
+    ui->gridRareOutputFileLine->setText(filePath);
 }
 
 
@@ -124,6 +135,32 @@ void MainWindow::gridOnRunAlgorithmButtonClicked()
 
     setCursor(Qt::ArrowCursor);
     ui->gridRunAlgorithmButton->setDisabled(false);
+}
+
+
+void MainWindow::gridOnFrequentItemsButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->gridFrequentItemsButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _gridTab->onFrequentItemsButtonClicked();
+
+    setCursor(Qt::ArrowCursor);
+    ui->gridFrequentItemsButton->setDisabled(false);
+}
+
+
+void MainWindow::gridOnRareItemsButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->gridRareItemsButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _gridTab->onRareItemsButtonClicked();
+
+    setCursor(Qt::ArrowCursor);
+    ui->gridRareItemsButton->setDisabled(false);
 }
 
 
