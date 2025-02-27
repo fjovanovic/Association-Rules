@@ -8,10 +8,11 @@ FrequentItemset::FrequentItemset()
 
     _inputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/";
     _outputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/";
-    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/input4_10000.txt";
+    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/input4_10000_fruit.txt";
     _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/output.txt";
 
     _nodeRadius = 25;
+    _maxWidth = 0;
 
     _editor = new QTextEdit(nullptr);
     _editor->setReadOnly(true);
@@ -89,6 +90,7 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     _nodesSupport.clear();
     _nodePositions.clear();
     _removalColoring = true;
+    _itemMap.clear();
 
     bool readFileSuccess = readFile();
     if(!readFileSuccess) {
@@ -107,6 +109,18 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     _currentChildrenMap = _childrenMap;
 
     drawTree(scene);
+
+    QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
+    QPen textPen = QPen(Qt::black, 2);
+    int yOffset = 10;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
+    QGraphicsRectItem *legendItemsRect = scene->addRect(_maxWidth - 110, -60, 100, legentItemsRectHeight, textPen, legendBrush);
+    for(auto it = _itemMap.begin(); it != _itemMap.end(); ++it) {
+        QString legendText = QString::number(it.key()) + ": " + it.value();
+        QGraphicsTextItem *itemText = scene->addText(legendText);
+        itemText->setPos(_maxWidth - 110, yOffset - 70);
+        yOffset += 20;
+    }
 }
 
 
@@ -324,6 +338,7 @@ bool FrequentItemset::readFile()
     }
 
     QTextStream in(&file);
+    int itemCounter = 1;
     while(!in.atEnd()) {
         QString line = in.readLine().trimmed();
 
@@ -332,15 +347,15 @@ bool FrequentItemset::readFile()
             return false;
         }
 
-        QStringList items = line.split(" ", Qt::SkipEmptyParts);
+        QStringList items = line.split(", ", Qt::SkipEmptyParts);
         QVector<int> transaction;
         for(const QString &item : items) {
-            bool isNumber = false;
-            int itemInt = item.toInt(&isNumber);
-
-            if(!isNumber) {
-                QMessageBox::critical(nullptr, "Error", "Invalid input file: Non-numeric value");
-                return false;
+            int itemInt;
+            if(!_itemMap.values().contains(item)) {
+                itemInt = itemCounter++;
+                _itemMap[itemInt] = item;
+            } else {
+                itemInt = _itemMap.key(item);
             }
 
             transaction.append(itemInt);
@@ -351,7 +366,6 @@ bool FrequentItemset::readFile()
     }
 
     file.close();
-
     return true;
 }
 
@@ -492,9 +506,9 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
         }
     }
 
-    int maxWidth = 0;
+    _maxWidth = 0;
     for(auto it = widths.begin(); it != widths.end(); it++) {
-        maxWidth = std::max(maxWidth, it.value());
+        _maxWidth = std::max(_maxWidth, it.value());
     }
 
     for(QVector<int> &transaction : _sortedTransactions) {
@@ -505,11 +519,11 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
         }
     }
 
-    maxWidth *= 100;
+    _maxWidth *= 100;
     int levelHeight = 130;
     int currentY = 0;
 
-    QPointF rootPos(maxWidth / 2.0, currentY);
+    QPointF rootPos(_maxWidth / 2.0, currentY);
     scene->addEllipse(
         rootPos.x() - _nodeRadius, rootPos.y() - _nodeRadius,
         _nodeRadius * 2, _nodeRadius * 2,
@@ -534,7 +548,7 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
         QVector<QPointF> positions;
 
         for(int i = 0; i < nodeCount; i++) {
-            double xPosition = (maxWidth / static_cast<double>(nodeCount)) * (i + 0.5);
+            double xPosition = (_maxWidth / static_cast<double>(nodeCount)) * (i + 0.5);
             positions.append(QPointF(xPosition, currentY));
         }
 

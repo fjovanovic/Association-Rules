@@ -38,6 +38,7 @@ private:
     QString _inputOpenFilePath;
     QString _outputOpenFilePath;
     int _nodeRadius;
+    int _maxWidth;
     QTextEdit *_editor;
     QMap<QVector<int>, int> _nodesSupport;
     QVector<QVector<int>> _transactions;
@@ -51,6 +52,7 @@ private:
     bool _removalColoring;
     double _minSupport;
     QMap<QVector<int>, int> _frequentItemsets;
+    QMap<int, QString> _itemMap;
 
     // Functions
     bool readFile();
