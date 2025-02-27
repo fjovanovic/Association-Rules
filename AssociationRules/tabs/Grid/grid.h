@@ -25,12 +25,16 @@ public:
 
     // Getters
     QString getInputFilePath();
-    QString getOutputFilePath();
+    QString getFrequentOutputFilePath();
+    QString getRareOutputFilePath();
 
     // Slots
     QString onBrowseButtonClicked();
-    QString onChangeButtonClicked();
+    QString onChangeFrequentButtonClicked();
+    QString onChangeRareButtonClicked();
     void onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport);
+    void onFrequentItemsButtonClicked();
+    void onRareItemsButtonClicked();
 
 private:
     // Fields
@@ -72,12 +76,13 @@ private:
         const QVector<QVector<int>> &closedAndMaximalItemsets
     );
     bool saveFile(
-        const QVector<QPair<QVector<int>, int>> &frequentItemsets,
+        const QVector<QVector<int>> &gridSets,
+        const QVector<int> &gridSupports,
+        const QMap<QVector<int>, int> &frequentItemsets,
         const QVector<QVector<int>> &closedItemsets,
         const QVector<QVector<int>> &maximalItemsets,
         const QVector<QVector<int>> &closedAndMaximalItemsets
     );
-
     QVector<QVector<int>> generateSubsets(const QVector<int> &set);
     QVector<QPair<QVector<int>, int>> sortBySetSize(const QMap<QVector<int>, int> &frequentItemsets);
 };
