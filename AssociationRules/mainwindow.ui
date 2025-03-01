@@ -302,7 +302,7 @@
             </item>
             <item row="0" column="2">
              <property name="text">
-              <string>(e.g. 0.25)</string>
+              <string>(0.25 for 25%)</string>
              </property>
             </item>
            </widget>
