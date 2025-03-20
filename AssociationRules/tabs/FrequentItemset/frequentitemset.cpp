@@ -13,6 +13,9 @@ FrequentItemset::FrequentItemset()
 
     _nodeRadius = 25;
     _maxWidth = 0;
+    _currentTrIndex = 0;
+    _levelHeight = 130;
+    _treeBuilt = false;
 
     _editor = new QTextEdit(nullptr);
     _editor->setReadOnly(true);
@@ -90,7 +93,11 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     _nodesSupport.clear();
     _nodePositions.clear();
     _removalColoring = true;
+    _treeBuilt = false;
+    _currentTrIndex = 0;
+    _maxWidth = 0;
     _itemMap.clear();
+    _widths.clear();
 
     bool readFileSuccess = readFile();
     if(!readFileSuccess) {
@@ -106,21 +113,251 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     removeRareItemsets();
     findChildren();
 
-    _currentChildrenMap = _childrenMap;
+    _childrenMapUp = _childrenMap;
 
-    drawTree(scene);
+    configTree(scene);
+    drawItemsLegend(scene);
+}
 
-    QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
-    QPen textPen = QPen(Qt::black, 2);
-    int yOffset = 10;
-    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
-    QGraphicsRectItem *legendItemsRect = scene->addRect(_maxWidth - 110, -60, 100, legentItemsRectHeight, textPen, legendBrush);
-    for(auto it = _itemMap.begin(); it != _itemMap.end(); ++it) {
-        QString legendText = QString::number(it.key()) + ": " + it.value();
-        QGraphicsTextItem *itemText = scene->addText(legendText);
-        itemText->setPos(_maxWidth - 110, yOffset - 70);
-        yOffset += 20;
+
+void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
+{
+    if(_treeBuilt) {
+        QMessageBox::critical(nullptr, "Error", "The tree is already built");
+        clearTransactionsLegend(scene);
+        return;
     }
+
+    if(_currentTrIndex == 0) {
+        QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
+        QPen textPen = QPen(Qt::black, 2);
+        int yOffset = -58;
+
+        QGraphicsRectItem *item = scene->addRect(-240, -60, 350, 45, textPen, legendBrush);
+        QString legendText1 = "Tr" + QString::number(_currentTrIndex + 1) + ": ";
+        QString legendText2 = "Tr" + QString::number(_currentTrIndex + 2) + ": ";
+
+        for(int i = 0; i < _sortedTransactions[_currentTrIndex].size(); i++) {
+            legendText1 += _itemMap[_sortedTransactions[_currentTrIndex][i]] + ", ";
+        }
+        legendText1 = legendText1.removeLast().removeLast();
+
+        for(int i = 0; i < _sortedTransactions[_currentTrIndex+1].size(); i++) {
+            legendText2 += _itemMap[_sortedTransactions[_currentTrIndex+1][i]] + ", ";
+        }
+        legendText2 = legendText2.removeLast().removeLast();
+
+        QGraphicsTextItem *itemText1 = scene->addText(legendText1);
+        QGraphicsTextItem *itemText2 = scene->addText(legendText2);
+        QFont font = itemText1->font();
+        font.setBold(true);
+        itemText1->setFont(font);
+        itemText1->setPos(-240, yOffset);
+        itemText2->setPos(-240, yOffset + 20);
+    } else {
+        QString legendText1 = "Tr" + QString::number(_currentTrIndex + 1) + ": ";
+        QString legendText2 = "Tr" + QString::number(_currentTrIndex + 2) + ": ";
+
+        for(int i = 0; i < _sortedTransactions[_currentTrIndex].size(); i++) {
+            legendText1 += _itemMap[_sortedTransactions[_currentTrIndex][i]] + ", ";
+        }
+        legendText1 = legendText1.removeLast().removeLast();
+
+        if(_currentTrIndex != (_sortedTransactions.size() - 1)) {
+            for(int i = 0; i < _sortedTransactions[_currentTrIndex+1].size(); i++) {
+                legendText2 += _itemMap[_sortedTransactions[_currentTrIndex+1][i]] + ", ";
+            }
+            legendText2 = legendText2.removeLast().removeLast();
+        }
+
+        for(QGraphicsItem *sceneItem : scene->items()) {
+            QGraphicsTextItem *textItem = dynamic_cast<QGraphicsTextItem*>(sceneItem);
+            QString nodeText1 = "Tr" + QString::number(_currentTrIndex);
+            QString nodeText2 = "Tr" + QString::number(_currentTrIndex + 1);
+
+            if(_currentTrIndex == (_sortedTransactions.size() - 1)) {
+                if(textItem && textItem->toPlainText().startsWith(nodeText1)) {
+                    textItem->setPlainText(legendText1);
+                } else if(textItem && textItem->toPlainText().startsWith(nodeText2)) {
+                    delete textItem;
+                }
+
+                _treeBuilt = true;
+            } else {
+                if(textItem && textItem->toPlainText().startsWith(nodeText1)) {
+                    textItem->setPlainText(legendText1);
+                } else if(textItem && textItem->toPlainText().startsWith(nodeText2)) {
+                    textItem->setPlainText(legendText2);
+                }
+            }
+        }
+    }
+
+    QVector<int> currentTr = _sortedTransactions[_currentTrIndex];
+    QVector<int> currentSet;
+
+    for(int item : currentTr) {
+        currentSet.append(item);
+        int freq = 1;
+        if(_setsFrequenciesDown.contains(currentSet)) {
+            // There is a line between parent and child, just update the text
+            freq = _setsFrequenciesDown[currentSet];
+            freq++;
+            for(QGraphicsItem *sceneItem : scene->items()) {
+                QGraphicsTextItem *textItem = dynamic_cast<QGraphicsTextItem*>(sceneItem);
+                QString previousNodeText = QString::number(item) + ": " + QString::number(freq - 1);
+
+                QPointF nodePosition = _nodePositions[currentSet];
+                double minX = nodePosition.x() - _nodeRadius;
+                double maxX = nodePosition.x() + _nodeRadius;
+                double minY = nodePosition.y() - _nodeRadius;
+                double maxY = nodePosition.y() + _nodeRadius;
+
+                if(textItem && (textItem->toPlainText() == previousNodeText)) {
+                    if(
+                        (textItem->x() <= maxX) && (textItem->x() >= minX) &&
+                        (textItem->y() <= maxY) && (textItem->y() >= minY)
+                    ) {
+                        QString nodeText = QString::number(item) + ": " + QString::number(freq);
+                        textItem->setPlainText(nodeText);
+                        textItem->setPos(
+                            nodePosition.x() - textItem->boundingRect().width() / 2,
+                            nodePosition.y() - textItem->boundingRect().height() / 2
+                        );
+                        break;
+                    }
+                }
+            }
+        } else {
+            // Connect parent with child (draw the line)
+            QPointF nodePos = _nodePositions[currentSet];
+            if(currentSet.size() == 1) {
+                // First level connection (root)
+                scene->addLine(
+                    _rootPos.x(),
+                    _rootPos.y() + _nodeRadius,
+                    nodePos.x(),
+                    nodePos.y() - _nodeRadius,
+                    QPen(Qt::white)
+                );
+            } else {
+                QVector<int> parentSet = currentSet;
+                parentSet.pop_back();
+
+                if(_nodePositions.contains(parentSet)) {
+                    QPointF parentPos = _nodePositions[parentSet];
+                    scene->addLine(
+                        parentPos.x(),
+                        parentPos.y() + _nodeRadius,
+                        nodePos.x(),
+                        nodePos.y() - _nodeRadius,
+                        QPen(Qt::white)
+                    );
+                }
+            }
+
+            QGraphicsEllipseItem *node = scene->addEllipse(
+                nodePos.x() - _nodeRadius, nodePos.y() - _nodeRadius,
+                _nodeRadius * 2, _nodeRadius * 2,
+                QPen(Qt::black), QBrush(Qt::white)
+            );
+
+            QString nodeText = QString::number(currentSet.last()) + ": " + QString::number(freq);
+            QGraphicsTextItem *text = scene->addText(nodeText);
+            QFont font = text->font();
+            font.setPointSize(7);
+            text->setFont(font);
+            text->setPos(
+                nodePos.x() - text->boundingRect().width() / 2,
+                nodePos.y() - text->boundingRect().height() / 2
+            );
+            text->setDefaultTextColor(Qt::black);
+
+            _nodePositions[currentSet] = nodePos;
+            _setsFrequenciesDown[currentSet] = 0;
+        }
+
+        _setsFrequenciesDown[currentSet]++;
+    }
+
+    _currentTrIndex++;
+}
+
+
+void FrequentItemset::onDrawFullTreeButtonClicked(QGraphicsScene *scene)
+{
+    scene->clear();
+    _pendingRemovalEllipses.clear();
+    _childrenMapUp = _childrenMap;
+    _removalColoring = true;
+
+    QGraphicsEllipseItem *rootNode = scene->addEllipse(
+        _rootPos.x() - _nodeRadius, _rootPos.y() - _nodeRadius,
+        _nodeRadius * 2, _nodeRadius * 2,
+        QPen(Qt::black), QBrush(Qt::white)
+    );
+    QGraphicsTextItem *rootText = scene->addText("null");
+    QFont font = rootText->font();
+    font.setPointSize(7);
+    rootText->setFont(font);
+    rootText->setPos(
+        _rootPos.x() - rootText->boundingRect().width() / 2,
+        _rootPos.y() - rootText->boundingRect().height() / 2
+    );
+    rootText->setDefaultTextColor(Qt::black);
+
+    drawItemsLegend(scene);
+
+    for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
+        QVector<int> parentKey = it.key();
+        QPointF parentPos = _nodePositions[parentKey];
+        if(parentKey.size() == 1) {
+            scene->addLine(
+                _rootPos.x(),
+                _rootPos.y() + _nodeRadius,
+                parentPos.x(),
+                parentPos.y() - _nodeRadius,
+                QPen(Qt::white)
+            );
+        }
+
+        for(const QVector<int> &childKey : it.value()) {
+            if(_nodePositions.contains(childKey)) {
+                QPointF childPos = _nodePositions[childKey];
+                scene->addLine(
+                    parentPos.x(),
+                    parentPos.y() + _nodeRadius,
+                    childPos.x(),
+                    childPos.y() - _nodeRadius,
+                    QPen(Qt::white)
+                );
+            }
+        }
+    }
+
+    for(auto it = _nodePositions.begin(); it != _nodePositions.end(); it++) {
+        QVector<int> nodeKey = it.key();
+        QPointF nodePos = it.value();
+        scene->addEllipse(
+            nodePos.x() - _nodeRadius,
+            nodePos.y() - _nodeRadius,
+            _nodeRadius * 2, _nodeRadius * 2,
+            QPen(Qt::black),
+            QBrush(Qt::white)
+        );
+
+        QString nodeText = QString::number(nodeKey.last()) + ": " + QString::number(_nodesSupport[nodeKey]);
+        QGraphicsTextItem *textItem = scene->addText(nodeText);
+        QFont font = textItem->font();
+        font.setPointSize(7);
+        textItem->setFont(font);
+        textItem->setPos(
+            nodePos.x() - textItem->boundingRect().width() / 2,
+            nodePos.y() - textItem->boundingRect().height() / 2
+        );
+    }
+
+    _treeBuilt = true;
 }
 
 
@@ -131,31 +368,28 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
         return;
     }
 
-    if(_currentChildrenMap.size() == 0) {
-        QVector<QVector<int>> frequentItemsetVector = _frequentItemsets.keys();
-        std::sort(frequentItemsetVector.begin(), frequentItemsetVector.end(),
-            [](const QVector<int> &a, const QVector<int> &b) {
-                if(a.size() == b.size()) {
-                    return a < b;
-                }
-
-                return a.size() < b.size();
-            }
-        );
-
-        saveFile(frequentItemsetVector);
-
+    if(!_treeBuilt) {
+        QMessageBox::critical(nullptr, "Error", "The tree needs to be build first");
         return;
     }
 
+    if(_childrenMapUp.size() == 0) {
+        QMessageBox::critical(nullptr, "Error", "Algorithm is done, open file to check frequent itemsets");
+        return;
+    }
+
+    if(_childrenMapUp.size() == _childrenMap.size()) {
+        clearTransactionsLegend(scene);
+    }
+
     int maxDepth = 0;
-    for(auto it = _currentChildrenMap.cbegin(); it != _currentChildrenMap.cend(); it++) {
+    for(auto it = _childrenMapUp.cbegin(); it != _childrenMapUp.cend(); it++) {
         int keySize = it.key().size();
         maxDepth = std::max(maxDepth, keySize);
     }
 
     QVector<QVector<int>> deepestNodes;
-    for(auto it = _currentChildrenMap.cbegin(); it != _currentChildrenMap.cend(); it++) {
+    for(auto it = _childrenMapUp.cbegin(); it != _childrenMapUp.cend(); it++) {
         if(it.key().size() == maxDepth) {
             deepestNodes.append(it.key());
         }
@@ -172,7 +406,7 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
     }
 
     QVector<QVector<int>> nodesToRemove;
-    for(auto it = _currentChildrenMap.cbegin(); it != _currentChildrenMap.cend(); it++) {
+    for(auto it = _childrenMapUp.cbegin(); it != _childrenMapUp.cend(); it++) {
         if(it.key().last() == nodeToRemove.last() && it.value().isEmpty()) {
             nodesToRemove.append(it.key());
         }
@@ -257,32 +491,9 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
                 }
             }
 
-            if(nodeToRemove) {
-                scene->removeItem(nodeToRemove);
-                delete nodeToRemove;
-            }
+            nodeToRemove->setBrush(Qt::red);
 
-            if(textToRemove) {
-                scene->removeItem(textToRemove);
-                delete textToRemove;
-            }
-
-            QGraphicsEllipseItem *ellipse = scene->addEllipse(
-                pos.x() - _nodeRadius, pos.y() - _nodeRadius,
-                _nodeRadius * 2, _nodeRadius * 2,
-                QPen(Qt::black), QBrush(Qt::red)
-            );
-            QString nodeText = QString::number(node.last()) + ": " + QString::number(_nodesSupport[node]);
-            QGraphicsTextItem *text = scene->addText(nodeText);
-            QFont font = text->font();
-            font.setPointSize(7);
-            text->setFont(font);
-            text->setPos(
-                pos.x() - text->boundingRect().width() / 2,
-                pos.y() - text->boundingRect().height() / 2
-            );
-            text->setDefaultTextColor(Qt::black);
-            _pendingRemovalEllipses.append(ellipse);
+            _pendingRemovalEllipses.append(nodeToRemove);
         }
 
         _editor->setText(message);
@@ -291,13 +502,13 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
         _removalColoring = false;
     } else {
         for(const auto &node : nodesToRemove) {
-            for(auto &parent : _currentChildrenMap.keys()) {
-                if(_currentChildrenMap[parent].contains(node)) {
-                    _currentChildrenMap[parent].removeOne(node);
+            for(auto &parent : _childrenMapUp.keys()) {
+                if(_childrenMapUp[parent].contains(node)) {
+                    _childrenMapUp[parent].removeOne(node);
                     break;
                 }
             }
-            _currentChildrenMap.remove(node);
+            _childrenMapUp.remove(node);
         }
 
         for(auto &ellipse : _pendingRemovalEllipses) {
@@ -325,6 +536,32 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
 
         _pendingRemovalEllipses.clear();
         _removalColoring = true;
+    }
+
+    if(_childrenMapUp.size() == 0) {
+        QVector<QVector<int>> frequentItemsetVector = _frequentItemsets.keys();
+        std::sort(frequentItemsetVector.begin(), frequentItemsetVector.end(),
+            [](const QVector<int> &a, const QVector<int> &b) {
+                if(a.size() == b.size()) {
+                    return a < b;
+                }
+
+                return a.size() < b.size();
+            }
+        );
+
+        saveFile(frequentItemsetVector);
+
+        QMessageBox::information(nullptr, "Success", "Open file to check frequent itemsets");
+        return;
+    }
+}
+
+
+void FrequentItemset::onOpenOutputFileButtonClicked()
+{
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFilePath))) {
+        QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
     }
 }
 
@@ -384,7 +621,7 @@ void FrequentItemset::sortTransactions()
 {
     _sortedTransactions = _transactions;
     for(QVector<int> &transaction : _sortedTransactions) {
-        std::sort(transaction.begin(), transaction.end(),
+        std::stable_sort(transaction.begin(), transaction.end(),
             [this](int a, int b) {
                 return _itemsFrequencies.value(a, 0) > _itemsFrequencies.value(b, 0);
             }
@@ -479,13 +716,64 @@ bool FrequentItemset::childExists(const QVector<QVector<int>> &childrenList, con
 }
 
 
-void FrequentItemset::drawTree(QGraphicsScene *scene)
+struct Node {
+    QVector<QPair<int, Node*>> items;
+    QVector<int> node;
+};
+
+
+void addToTree(Node* node, const QVector<int>& tr)
 {
-    QMap<int, int> widths;
+    QVector<int> currentTr;
+    for(int item : tr) {
+        currentTr.push_back(item);
+
+        Node* nextNode = nullptr;
+        for(auto& p : node->items) {
+            if(p.first == item) {
+                nextNode = p.second;
+                break;
+            }
+        }
+
+        if(!nextNode) {
+            nextNode = new Node();
+            nextNode->node = currentTr;
+            node->items.push_back({item, nextNode});
+        }
+
+        node = nextNode;
+    }
+}
+
+
+void printAllTree(Node* node, QVector<QVector<QVector<int>>>& rows)
+{
+    if(!node) {
+        return;
+    }
+
+    if(!node->node.empty()) {
+        int rowIndex = node->node.size() - 1;
+        if(rows.size() <= rowIndex) {
+            rows.resize(rowIndex + 1);
+        }
+
+        rows[rowIndex].push_back(node->node);
+    }
+
+    for(auto& p: node->items) {
+        printAllTree(p.second, rows);
+    }
+}
+
+
+void FrequentItemset::configTree(QGraphicsScene *scene)
+{
     for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
         QVector<int> node = it.key();
         int keySize = node.size();
-        widths[keySize]++;
+        _widths[keySize]++;
         _nodesSupport[node] = 0;
 
         for(const QVector<int> &child : it.value()) {
@@ -500,32 +788,45 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
             }
 
             if(!existsInKeys) {
-                widths[valueSize]++;
+                _widths[valueSize]++;
                 _nodesSupport[child] = 0;
             }
         }
     }
 
-    _maxWidth = 0;
-    for(auto it = widths.begin(); it != widths.end(); it++) {
-        _maxWidth = std::max(_maxWidth, it.value());
-    }
-
-    for(QVector<int> &transaction : _sortedTransactions) {
-        QVector<int> current;
+    for(QVector<int> transaction : _sortedTransactions) {
+        QVector<int> currentSet;
         for(int item : transaction) {
-            current.push_back(item);
-            _nodesSupport[current]++;
+            currentSet.append(item);
+            _nodesSupport[currentSet]++;
         }
     }
 
+    _maxWidth = 0;
+    for(auto it = _widths.begin(); it != _widths.end(); it++) {
+        _maxWidth = std::max(_maxWidth, it.value());
+    }
+
+    // (X, Y, width, height)
+    // X = (100 = 2*x + 2*_nodeRadius, x being dist from space for 1 node to circle)
+    //      100 is space for one node (_maxWidth * 100)
+    //      x = (_maxWidth - 2*_nodeRadius) / 2 - 0.5
+    // Y = legend.y() - 1;
+    // width = (_maxWidth * 100) - sceneX + ((_maxWidth * 100) - legend.x() + legend.width()) + 1
+    // height = (numOfNodeLevels * _levelHeight) + (2 * _nodeRadius) + legend.y() - _nodeRadius + 1.5;
+    double sceneX = 50 - _nodeRadius - 0.5;
+    double sceneY = -61;
+    double sceneWidth = (_maxWidth * 100) - sceneX + 21;
+    double sceneHeight = (_widths.size() * static_cast<double>(_levelHeight)) + (2 * static_cast<double>(_nodeRadius)) + 60 - _nodeRadius + 1.5;
+
+    scene->setSceneRect(sceneX, sceneY, sceneWidth, sceneHeight);
+
     _maxWidth *= 100;
-    int levelHeight = 130;
     int currentY = 0;
 
-    QPointF rootPos(_maxWidth / 2.0, currentY);
+    _rootPos = QPointF(_maxWidth / 2.0, currentY);
     scene->addEllipse(
-        rootPos.x() - _nodeRadius, rootPos.y() - _nodeRadius,
+        _rootPos.x() - _nodeRadius, _rootPos.y() - _nodeRadius,
         _nodeRadius * 2, _nodeRadius * 2,
         QPen(Qt::black), QBrush(Qt::white)
     );
@@ -534,91 +835,40 @@ void FrequentItemset::drawTree(QGraphicsScene *scene)
     font.setPointSize(7);
     rootText->setFont(font);
     rootText->setPos(
-        rootPos.x() - rootText->boundingRect().width() / 2,
-        rootPos.y() - rootText->boundingRect().height() / 2
+        _rootPos.x() - rootText->boundingRect().width() / 2,
+        _rootPos.y() - rootText->boundingRect().height() / 2
     );
     rootText->setDefaultTextColor(Qt::black);
 
-    currentY += levelHeight;
+    currentY = _levelHeight;
+    QVector<QPointF> positions;
 
-    for(auto it = widths.begin(); it != widths.end(); it++) {
+    for(auto it = _widths.begin(); it != _widths.end(); it++) {
         int level = it.key();
         int nodeCount = it.value();
-
-        QVector<QPointF> positions;
 
         for(int i = 0; i < nodeCount; i++) {
             double xPosition = (_maxWidth / static_cast<double>(nodeCount)) * (i + 0.5);
             positions.append(QPointF(xPosition, currentY));
         }
 
-        int index = 0;
-        for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
-            const QVector<int> &childKey = it.key();
-            if(childKey.size() == level) {
-                _nodePositions[childKey] = positions[index++];
-                if(index >= positions.size()) {
-                    break;
-                }
-            }
-        }
-
-        for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
-            const QVector<int> &childKey = it.key();
-            if(childKey.size() == level) {
-                QPointF pos = _nodePositions[childKey];
-                scene->addEllipse(
-                    pos.x() - _nodeRadius, pos.y() - _nodeRadius,
-                    _nodeRadius * 2, _nodeRadius * 2,
-                    QPen(Qt::black), QBrush(Qt::white)
-                );
-
-                QString nodeText = QString::number(childKey.last()) + ": " + QString::number(_nodesSupport[childKey]);
-                QGraphicsTextItem *text = scene->addText(nodeText);
-                QFont font = text->font();
-                font.setPointSize(7);
-                text->setFont(font);
-                text->setPos(
-                    pos.x() - text->boundingRect().width() / 2,
-                    pos.y() - text->boundingRect().height() / 2
-                );
-                text->setDefaultTextColor(Qt::black);
-            }
-        }
-
-        currentY += levelHeight;
+        currentY += _levelHeight;
     }
 
-    for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
-        const QVector<int> &childKey = it.key();
-        if(childKey.size() == 1) {
-            QPointF childPos = _nodePositions[childKey];
-            scene->addLine(
-                rootPos.x(), rootPos.y() + _nodeRadius,
-                childPos.x(), childPos.y() - _nodeRadius,
-                QPen(Qt::white)
-            );
-        }
+    Node *node = new Node();
+    for(const QVector<int> tr : _sortedTransactions) {
+        addToTree(node, tr);
     }
 
-    for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
-        const QVector<int> &parent = it.key();
-        const QVector<QVector<int>> &children = it.value();
+    QVector<QVector<QVector<int>>> rows;
 
-        if(!_nodePositions.contains(parent)) {
-            continue;
-        }
+    printAllTree(node, rows);
 
-        QPointF parentPos = _nodePositions[parent];
-        for(const QVector<int> &child : children) {
-            if(_nodePositions.contains(child)) {
-                QPointF childPos = _nodePositions[child];
-                scene->addLine(
-                    parentPos.x(), parentPos.y() + _nodeRadius,
-                    childPos.x(), childPos.y() - _nodeRadius,
-                    QPen(Qt::white)
-                );
-            }
+    int index = 0;
+    for(int i = 0; i < rows.size(); i++) {
+        for(int j = 0; j < rows[i].size(); j++) {
+            _nodePositions[rows[i][j]] = positions[index];
+            index++;
         }
     }
 }
@@ -655,8 +905,39 @@ void FrequentItemset::saveFile(const QVector<QVector<int>> &frequentItemsets)
     }
 
     file.close();
+}
 
-    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFilePath))) {
-        QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
+
+void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
+{
+    QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
+    QPen textPen = QPen(Qt::black, 2);
+    int yOffset = 10;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
+    QGraphicsRectItem *legendItemsRect = scene->addRect(_maxWidth - 110, -60, 130, legentItemsRectHeight, textPen, legendBrush);
+
+    for(auto it = _itemMap.begin(); it != _itemMap.end(); it++) {
+        QString legendText = QString::number(it.key()) + ": " + it.value() + " (" + QString::number(_itemsFrequencies.value(it.key())) + ")";
+        QGraphicsTextItem *itemText = scene->addText(legendText);
+        itemText->setPos(_maxWidth - 110, yOffset - 70);
+        yOffset += 20;
+    }
+}
+
+
+void FrequentItemset::clearTransactionsLegend(QGraphicsScene *scene)
+{
+    for(QGraphicsItem *sceneItem : scene->items()) {
+        QGraphicsRectItem *rectItem = dynamic_cast<QGraphicsRectItem*>(sceneItem);
+        QGraphicsTextItem *textItem = dynamic_cast<QGraphicsTextItem*>(sceneItem);
+
+        if(rectItem) {
+            QPointF rectPos = rectItem->scenePos() + rectItem->rect().topLeft();
+            if(rectPos.x() == -240 && rectPos.y() == -60) {
+                delete rectItem;
+            }
+        } else if(textItem && (textItem->toPlainText().startsWith("Tr"))) {
+            delete textItem;
+        }
     }
 }
