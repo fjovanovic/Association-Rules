@@ -12,10 +12,7 @@ FrequentItemset::FrequentItemset()
     _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/output.txt";
 
     _nodeRadius = 25;
-    _maxWidth = 0;
-    _currentTrIndex = 0;
     _levelHeight = 130;
-    _treeBuilt = false;
 
     _editor = new QTextEdit(nullptr);
     _editor->setReadOnly(true);
@@ -91,6 +88,7 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     _pendingRemovalEllipses.clear();
     _frequentItemsets.clear();
     _nodesSupport.clear();
+    _nodesSupportDown.clear();
     _nodePositions.clear();
     _removalColoring = true;
     _treeBuilt = false;
@@ -98,6 +96,7 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
     _maxWidth = 0;
     _itemMap.clear();
     _widths.clear();
+    _nodePointers.clear();
 
     bool readFileSuccess = readFile();
     if(!readFileSuccess) {
@@ -199,9 +198,9 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
     for(int item : currentTr) {
         currentSet.append(item);
         int freq = 1;
-        if(_setsFrequenciesDown.contains(currentSet)) {
+        if(_nodesSupportDown.contains(currentSet)) {
             // There is a line between parent and child, just update the text
-            freq = _setsFrequenciesDown[currentSet];
+            freq = _nodesSupportDown[currentSet];
             freq++;
             for(QGraphicsItem *sceneItem : scene->items()) {
                 QGraphicsTextItem *textItem = dynamic_cast<QGraphicsTextItem*>(sceneItem);
@@ -274,13 +273,17 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
             text->setDefaultTextColor(Qt::black);
 
             _nodePositions[currentSet] = nodePos;
-            _setsFrequenciesDown[currentSet] = 0;
+            _nodesSupportDown[currentSet] = 0;
         }
 
-        _setsFrequenciesDown[currentSet]++;
+        _nodesSupportDown[currentSet]++;
     }
 
     _currentTrIndex++;
+
+    if(_currentTrIndex != 1) {
+        drawNodesPointers(scene, "down");
+    }
 }
 
 
@@ -337,27 +340,30 @@ void FrequentItemset::onDrawFullTreeButtonClicked(QGraphicsScene *scene)
 
     for(auto it = _nodePositions.begin(); it != _nodePositions.end(); it++) {
         QVector<int> nodeKey = it.key();
-        QPointF nodePos = it.value();
-        scene->addEllipse(
-            nodePos.x() - _nodeRadius,
-            nodePos.y() - _nodeRadius,
-            _nodeRadius * 2, _nodeRadius * 2,
-            QPen(Qt::black),
-            QBrush(Qt::white)
-        );
+        if(nodeKey != QVector<int>{0}) {
+            QPointF nodePos = it.value();
+            scene->addEllipse(
+                nodePos.x() - _nodeRadius,
+                nodePos.y() - _nodeRadius,
+                _nodeRadius * 2, _nodeRadius * 2,
+                QPen(Qt::black),
+                QBrush(Qt::white)
+            );
 
-        QString nodeText = QString::number(nodeKey.last()) + ": " + QString::number(_nodesSupport[nodeKey]);
-        QGraphicsTextItem *textItem = scene->addText(nodeText);
-        QFont font = textItem->font();
-        font.setPointSize(7);
-        textItem->setFont(font);
-        textItem->setPos(
-            nodePos.x() - textItem->boundingRect().width() / 2,
-            nodePos.y() - textItem->boundingRect().height() / 2
-        );
+            QString nodeText = QString::number(nodeKey.last()) + ": " + QString::number(_nodesSupport[nodeKey]);
+            QGraphicsTextItem *textItem = scene->addText(nodeText);
+            QFont font = textItem->font();
+            font.setPointSize(7);
+            textItem->setFont(font);
+            textItem->setPos(
+                nodePos.x() - textItem->boundingRect().width() / 2,
+                nodePos.y() - textItem->boundingRect().height() / 2
+            );
+        }
     }
 
     _treeBuilt = true;
+    drawNodesPointers(scene, "full");
 }
 
 
@@ -500,6 +506,8 @@ void FrequentItemset::onForwardButtonClicked(QGraphicsScene *scene)
         _editor->show();
 
         _removalColoring = false;
+        
+        drawNodesPointers(scene, "up");
     } else {
         for(const auto &node : nodesToRemove) {
             for(auto &parent : _childrenMapUp.keys()) {
@@ -914,12 +922,21 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
     QPen textPen = QPen(Qt::black, 2);
     int yOffset = 10;
     int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
-    QGraphicsRectItem *legendItemsRect = scene->addRect(_maxWidth - 110, -60, 130, legentItemsRectHeight, textPen, legendBrush);
+    int legendX = (_maxWidth <= 300) ? 300 : (_maxWidth - 110);
+    QGraphicsRectItem *legendItemsRect = scene->addRect(
+        legendX,
+        -60,
+        130,
+        legentItemsRectHeight,
+        textPen,
+        legendBrush
+    );
 
     for(auto it = _itemMap.begin(); it != _itemMap.end(); it++) {
-        QString legendText = QString::number(it.key()) + ": " + it.value() + " (" + QString::number(_itemsFrequencies.value(it.key())) + ")";
+        int val = _itemsFrequencies.value(it.key());
+        QString legendText = QString::number(it.key()) + ": " + it.value() + " (" + QString::number(val) + ")";
         QGraphicsTextItem *itemText = scene->addText(legendText);
-        itemText->setPos(_maxWidth - 110, yOffset - 70);
+        itemText->setPos(legendX, yOffset - 70);
         yOffset += 20;
     }
 }
@@ -938,6 +955,144 @@ void FrequentItemset::clearTransactionsLegend(QGraphicsScene *scene)
             }
         } else if(textItem && (textItem->toPlainText().startsWith("Tr"))) {
             delete textItem;
+        }
+    }
+}
+
+
+void FrequentItemset::configNodePointers()
+{
+    _nodePointers.clear();
+
+    QVector<int> emptyNode = {0};
+    for(auto it = _childrenMap.begin(); it != _childrenMap.end(); it++) {
+        QVector<int> parent = it.key();
+        QVector<QVector<int>> children = it.value();
+        _nodePointers[parent] = emptyNode;
+
+        for(QVector<int> child : children) {
+            if(!_nodePointers.contains(child)) {
+                _nodePointers[child] = emptyNode;
+            }
+        }
+    }
+}
+
+
+void FrequentItemset::drawNodesPointers(QGraphicsScene *scene, const QString path)
+{
+    configNodePointers();
+
+    QMap<int, QVector<QVector<int>>> nodeMatrix;
+
+    if(path == "down") {
+        for(auto it = _nodesSupportDown.begin(); it != _nodesSupportDown.end(); it++) {
+            QVector<int> node = it.key();
+            nodeMatrix[node.last()].append(node);
+        }
+    } else if(path == "full") {
+        for(const auto &node : _nodePositions.keys()) {
+            int lastElement = node.last();
+            nodeMatrix[lastElement].append(node);
+        }
+    } else if(path == "up") {
+        for(auto it = _childrenMapUp.begin(); it != _childrenMapUp.end(); it++) {
+            QVector<int> parent = it.key();
+            int lastElement = parent.last();
+            nodeMatrix[lastElement].append(parent);
+        }
+    }
+
+    for(auto it = nodeMatrix.begin(); it != nodeMatrix.end(); it++) {
+        QVector<QVector<int>> &nodes = it.value();
+        std::sort(nodes.begin(), nodes.end(),
+            [this](const QVector<int> &a, const QVector<int> &b) {
+                return _nodePositions[a].x() < _nodePositions[b].x();
+            }
+        );
+    }
+
+    for(auto it = nodeMatrix.begin(); it != nodeMatrix.end(); it++) {
+        QVector<QVector<int>> nodes = it.value();
+
+        for(int i = 0; i < nodes.size() - 1; i++) {
+            _nodePointers[nodes[i]] = nodes[i+1];
+        }
+    }
+
+    QPen dashedPen(Qt::red);
+    dashedPen.setStyle(Qt::DashLine);
+    dashedPen.setDashPattern({5, 5});
+    QVector<int> emptyVector = {0};
+
+    // Check if some pointers needs to be removed
+    for(QGraphicsItem *item : scene->items()) {
+        QGraphicsLineItem *lineItem = dynamic_cast<QGraphicsLineItem*>(item);
+        if(lineItem && (lineItem->pen().color() == Qt::red)) {
+            QLineF line = lineItem->line();
+            QPointF left = QPointF(line.x1(), line.y1());
+            QPointF right = QPointF(line.x2(), line.y2());
+
+            bool found = false;
+            for(auto it = _nodePointers.begin(); it != _nodePointers.end(); it++) {
+                QVector<int> leftNode = it.key();
+                QVector<int> rightNode = it.value();
+                QPointF leftNodePos = _nodePositions[leftNode];
+                QPointF rightNodePos = _nodePositions[rightNode];
+
+                if(
+                    ((leftNodePos.x() + 25) == left.x()) &&
+                    ((leftNodePos.y()) == left.y()) &&
+                    ((rightNodePos.x() - 25) == right.x()) &&
+                    ((rightNodePos.y() == right.y()))
+                ) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found) {
+                delete lineItem;
+            }
+        }
+    }
+
+    for(auto it = _nodePointers.begin(); it != _nodePointers.end(); it++) {
+        QVector<int> leftNode = it.key();
+        QVector<int> rightNode = it.value();
+        QPointF leftNodePos = _nodePositions[leftNode];
+        QPointF rightNodePos = _nodePositions[rightNode];
+
+        if(leftNode != rightNode) {
+            bool found = false;
+            for(QGraphicsItem *item : scene->items()) {
+                QGraphicsLineItem *lineItem = dynamic_cast<QGraphicsLineItem*>(item);
+                if(lineItem && (lineItem->pen().color() == Qt::red)) {
+                    QLineF line = lineItem->line();
+                    QPointF left = QPointF(line.x1(), line.y1());
+                    QPointF right = QPointF(line.x2(), line.y2());
+                    if(
+                        ((leftNodePos.x() + 25) == left.x()) &&
+                        ((leftNodePos.y()) == left.y()) &&
+                        ((rightNodePos.x() - 25) == right.x()) &&
+                        ((rightNodePos.y() == right.y()))
+                    ) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!found && (rightNode != emptyVector)) {
+                QGraphicsLineItem *lineItem = scene->addLine(
+                    leftNodePos.x() + _nodeRadius,
+                    leftNodePos.y(),
+                    rightNodePos.x() - _nodeRadius,
+                    rightNodePos.y(),
+                    dashedPen
+                );
+                lineItem->setZValue(-1);
+            }
         }
     }
 }
