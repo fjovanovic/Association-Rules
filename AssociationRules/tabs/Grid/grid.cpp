@@ -8,8 +8,9 @@ Grid::Grid()
 
     _inputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/";
     _outputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/";
-    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/input4_100000.txt";
-    _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output.txt";
+    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/input4_100000_fruit.txt";
+    _outputFrequentFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output_frequent.txt";
+    _outputRareFilePath = absoluteRootPath + "/AssociationRules/resources/Grid/output_rare.txt";
 
     _gridWidth = 0;
 
@@ -28,9 +29,15 @@ QString Grid::getInputFilePath()
 }
 
 
-QString Grid::getOutputFilePath()
+QString Grid::getFrequentOutputFilePath()
 {
-    return _outputFilePath;
+    return _outputFrequentFilePath;
+}
+
+
+QString Grid::getRareOutputFilePath()
+{
+    return _outputRareFilePath;
 }
 
 
@@ -53,7 +60,7 @@ QString Grid::onBrowseButtonClicked()
 }
 
 
-QString Grid::onChangeButtonClicked()
+QString Grid::onChangeFrequentButtonClicked()
 {
     QString filePath = QFileDialog::getOpenFileName(
         nullptr,
@@ -63,10 +70,29 @@ QString Grid::onChangeButtonClicked()
     );
 
     if(filePath.isEmpty()) {
-        return _outputFilePath;
+        return _outputFrequentFilePath;
     }
 
-    _outputFilePath = filePath;
+    _outputFrequentFilePath = filePath;
+
+    return filePath;
+}
+
+
+QString Grid::onChangeRareButtonClicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        nullptr,
+        "Select File",
+        _outputOpenFilePath,
+        "Text files (*.txt)"
+    );
+
+    if(filePath.isEmpty()) {
+        return _outputRareFilePath;
+    }
+
+    _outputRareFilePath = filePath;
 
     return filePath;
 }
@@ -75,6 +101,7 @@ QString Grid::onChangeButtonClicked()
 void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport)
 {
     _transactions.clear();
+    _itemMap.clear();
     scene->clear();
     QSet<int> gridItems;
 
@@ -95,7 +122,7 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     drawGrid(scene, gridSets, childrenMap, gridSupports, frequentKeys, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
 
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
-    QGraphicsRectItem *legendRect = scene->addRect(10 - (_gridWidth / 2), 10, 230, 65, _textPen, legendBrush);
+    QGraphicsRectItem *legendRect = scene->addRect(10 - (_gridWidth / 2), 10, 190, 85, _textPen, legendBrush);
     QGraphicsEllipseItem *closedItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 15, 15, 15, _textPen, _closedItemsetsBrush);
     QGraphicsTextItem *closedItemsetsText = scene->addText("Closed itemsets");
     closedItemsetsText->setPos(30 - (_gridWidth / 2), 10);
@@ -108,14 +135,43 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     QGraphicsTextItem *closedAndMaximalItemsetsText = scene->addText("Closed and maximal itemsets");
     closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 50);
     closedAndMaximalItemsetsText->setDefaultTextColor(Qt::black);
+    QGraphicsEllipseItem *rareItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 75, 15, 15, _textPen, _rareItemsetsBrush);
+    QGraphicsTextItem *rareItemsetsText = scene->addText("Rare itemsets");
+    rareItemsetsText->setPos(30 - (_gridWidth / 2), 70);
+    rareItemsetsText->setDefaultTextColor(Qt::black);
 
-    QVector<QPair<QVector<int>, int>> sortedItemsets = sortBySetSize(frequentItemsets);
-    bool saveFileSuccess = saveFile(sortedItemsets, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
+    int yOffset = 10;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
+    QGraphicsRectItem *legendItemsRect = scene->addRect((_gridWidth / 2) - 110, 10, 100, legentItemsRectHeight, _textPen, legendBrush);
+    for(auto it = _itemMap.begin(); it != _itemMap.end(); ++it) {
+        QString legendText = QString::number(it.key()) + ": " + it.value();
+        QGraphicsTextItem *itemText = scene->addText(legendText);
+        itemText->setPos((_gridWidth / 2) - 110, yOffset);
+        yOffset += 20;
+    }
+
+    bool saveFileSuccess = saveFile(gridSets, gridSupports, frequentItemsets, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
     if(!saveFileSuccess) {
         return;
     }
 
     _gridWidth = 0;
+}
+
+
+void Grid::onFrequentItemsButtonClicked()
+{
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFrequentFilePath))) {
+        QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
+    }
+}
+
+
+void Grid::onRareItemsButtonClicked()
+{
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputRareFilePath))) {
+        QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
+    }
 }
 
 
@@ -128,6 +184,7 @@ bool Grid::readFile(QSet<int> &gridItems)
     }
 
     QTextStream in(&file);
+    int itemCounter = 1;
     while(!in.atEnd()) {
         QString line = in.readLine().trimmed();
 
@@ -136,15 +193,15 @@ bool Grid::readFile(QSet<int> &gridItems)
             return false;
         }
 
-        QStringList items = line.split(" ", Qt::SkipEmptyParts);
+        QStringList items = line.split(", ", Qt::SkipEmptyParts);
         QVector<int> transaction;
         for(const QString &item : items) {
-            bool isNumber = false;
-            int itemInt = item.toInt(&isNumber);
-
-            if(!isNumber) {
-                QMessageBox::critical(nullptr, "Error", "Invalid input file: Non-numeric value");
-                return false;
+            int itemInt;
+            if(!_itemMap.values().contains(item)) {
+                itemInt = itemCounter++;
+                _itemMap[itemInt] = item;
+            } else {
+                itemInt = _itemMap.key(item);
             }
 
             if(!gridItems.contains(itemInt)) {
@@ -158,7 +215,6 @@ bool Grid::readFile(QSet<int> &gridItems)
     }
 
     file.close();
-
     return true;
 }
 
@@ -450,15 +506,23 @@ void Grid::drawGrid(
 
 
 bool Grid::saveFile(
-    const QVector<QPair<QVector<int>, int>> &frequentItemsets,
+    const QVector<QVector<int>> &gridSets,
+    const QVector<int> &gridSupports,
+    const QMap<QVector<int>, int> &frequentItemsets,
     const QVector<QVector<int>> &closedItemsets,
     const QVector<QVector<int>> &maximalItemsets,
     const QVector<QVector<int>> &closedAndMaximalItemsets
 )
 {
-    QFile file(_outputFilePath);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(nullptr, "Error", "Unable to open the output file");
+    QFile frequentFile(_outputFrequentFilePath);
+    QFile rareFile(_outputRareFilePath);
+    if(!frequentFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(nullptr, "Error", "Unable to open the output file for frequent items");
+        return false;
+    }
+
+    if(!rareFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(nullptr, "Error", "Unable to open the output file for rare items");
         return false;
     }
 
@@ -466,24 +530,27 @@ bool Grid::saveFile(
     const int supportWidth = 30;
     const int categoryWidth = 20;
 
-    QTextStream out(&file);
-    for(const auto &pair : frequentItemsets) {
-        const QVector<int> &itemset = pair.first;
+    QTextStream frequentOut(&frequentFile);
+    QTextStream rareOut(&rareFile);
+    int i = 1;
+    for(const auto &itemset : gridSets) {
         if(itemset.size() == 0)
             continue;
 
-        int support = pair.second;
+        int support = gridSupports[i];
         double supportPerc = static_cast<double>(support) / _transactions.size() * 100;
 
         QString category;
-        if (closedAndMaximalItemsets.contains(itemset)) {
+        if(closedAndMaximalItemsets.contains(itemset)) {
             category = "Closed and Maximal";
-        } else if (maximalItemsets.contains(itemset)) {
+        } else if(maximalItemsets.contains(itemset)) {
             category = "Maximal";
-        } else if (closedItemsets.contains(itemset)) {
+        } else if(closedItemsets.contains(itemset)) {
             category = "Closed";
-        } else {
+        } else if(frequentItemsets.contains(itemset)) {
             category = "Frequent";
+        } else {
+            category = "Rare";
         }
 
         QString itemsetString = "{";
@@ -493,20 +560,27 @@ bool Grid::saveFile(
         itemsetString = itemsetString.removeLast().removeLast();
         itemsetString += "}";
 
-        out << itemsetString.leftJustified(itemsetWidth)
-            << QString("#SUP: %1 (%2%)")
-               .arg(support)
-               .arg(supportPerc)
-               .leftJustified(supportWidth)
-            << category.leftJustified(categoryWidth) << "\n";
+        if(category == "Rare") {
+            rareOut << itemsetString.leftJustified(itemsetWidth)
+                    << QString("#SUP: %1 (%2%)")
+                           .arg(support)
+                           .arg(supportPerc)
+                           .leftJustified(supportWidth)
+                    << "\n";
+        } else {
+            frequentOut << itemsetString.leftJustified(itemsetWidth)
+                        << QString("#SUP: %1 (%2%)")
+                            .arg(support)
+                            .arg(supportPerc)
+                            .leftJustified(supportWidth)
+                        << category.leftJustified(categoryWidth) << "\n";
+        }
+
+        i++;
     }
 
-    file.close();
-
-    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFilePath))) {
-        QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
-        return false;
-    }
+    frequentFile.close();
+    rareFile.close();
 
     return true;
 }
