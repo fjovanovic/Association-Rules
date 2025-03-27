@@ -132,7 +132,9 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
         QPen textPen = QPen(Qt::black, 2);
         int yOffset = -58;
 
-        QGraphicsRectItem *item = scene->addRect(-240, -60, 350, 45, textPen, legendBrush);
+        int rectX = _rootPos.x() - _nodeRadius - 360;
+
+        QGraphicsRectItem *item = scene->addRect(rectX, -60, 350, 45, textPen, legendBrush);
         QString legendText1 = "Tr" + QString::number(_currentTrIndex + 1) + ": ";
         QString legendText2 = "Tr" + QString::number(_currentTrIndex + 2) + ": ";
 
@@ -151,8 +153,8 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
         QFont font = itemText1->font();
         font.setBold(true);
         itemText1->setFont(font);
-        itemText1->setPos(-240, yOffset);
-        itemText2->setPos(-240, yOffset + 20);
+        itemText1->setPos(rectX, yOffset);
+        itemText2->setPos(rectX, yOffset + 20);
     } else {
         QString legendText1 = "Tr" + QString::number(_currentTrIndex + 1) + ": ";
         QString legendText2 = "Tr" + QString::number(_currentTrIndex + 2) + ": ";
@@ -950,7 +952,8 @@ void FrequentItemset::clearTransactionsLegend(QGraphicsScene *scene)
 
         if(rectItem) {
             QPointF rectPos = rectItem->scenePos() + rectItem->rect().topLeft();
-            if(rectPos.x() == -240 && rectPos.y() == -60) {
+            int rectX = _rootPos.x() - _nodeRadius - 300;
+            if(rectPos.x() == rectX && rectPos.y() == -60) {
                 delete rectItem;
             }
         } else if(textItem && (textItem->toPlainText().startsWith("Tr"))) {
