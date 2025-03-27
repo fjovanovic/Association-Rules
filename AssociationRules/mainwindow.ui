@@ -163,7 +163,7 @@
          </layout>
         </item>
         <item row="2" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <layout class="QHBoxLayout" name="horizontalLayout_61">
           <item>
            <widget class="QLabel" name="label_2">
             <property name="minimumSize">
@@ -329,7 +329,7 @@
          </layout>
         </item>
         <item row="4" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QHBoxLayout" name="horizontalLayout_41">
           <property name="sizeConstraint">
            <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
