@@ -33,7 +33,10 @@ public slots:
     void freqOnBrowseButtonClicked();
     void freqOnChangeButtonClicked();
     void freqOnRunAlgorithmButtonClicked();
+    void freqOnDrawTransactionButtonClicked();
+    void freqOnDrawFullTreeButtonClicked();
     void freqOnForwardButtonClicked();
+    void freqOnOpenOutputFileButtonClicked();
 
 private:
     Ui::MainWindow *ui;

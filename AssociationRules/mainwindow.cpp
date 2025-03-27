@@ -21,7 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->freqBrowseButton, &QPushButton::clicked, this, &MainWindow::freqOnBrowseButtonClicked);
     connect(ui->freqChangeButton, &QPushButton::clicked, this, &MainWindow::freqOnChangeButtonClicked);
     connect(ui->freqRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::freqOnRunAlgorithmButtonClicked);
+    connect(ui->freqDrawTransactionButton, &QPushButton::clicked, this, &MainWindow::freqOnDrawTransactionButtonClicked);
+    connect(ui->freqDrawFullTreeButton, &QPushButton::clicked, this, &MainWindow::freqOnDrawFullTreeButtonClicked);
     connect(ui->freqForwardButton, &QPushButton::clicked, this, &MainWindow::freqOnForwardButtonClicked);
+    connect(ui->freqOpenOutputFileButton, &QPushButton::clicked, this, &MainWindow::freqOnOpenOutputFileButtonClicked);
 }
 
 
@@ -244,11 +247,55 @@ void MainWindow::freqOnRunAlgorithmButtonClicked()
 }
 
 
+void MainWindow::freqOnDrawTransactionButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqDrawTransactionButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _frequentItemsetTab->onDrawTransactionButtonClicked(_frequentItemsetScene);
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqDrawTransactionButton->setDisabled(false);
+}
+
+
+void MainWindow::freqOnDrawFullTreeButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqDrawFullTreeButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _frequentItemsetTab->onDrawFullTreeButtonClicked(_frequentItemsetScene);
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqDrawFullTreeButton->setDisabled(false);
+}
+
+
 void MainWindow::freqOnForwardButtonClicked()
 {
     setCursor(Qt::WaitCursor);
+    ui->freqForwardButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
     _frequentItemsetTab->onForwardButtonClicked(_frequentItemsetScene);
+
     setCursor(Qt::ArrowCursor);
+    ui->freqForwardButton->setDisabled(false);
+}
+
+
+void MainWindow::freqOnOpenOutputFileButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqOpenOutputFileButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _frequentItemsetTab->onOpenOutputFileButtonClicked();
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqOpenOutputFileButton->setDisabled(false);
 }
 
 
