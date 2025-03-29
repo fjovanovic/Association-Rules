@@ -3,13 +3,18 @@
 
 FrequentItemset::FrequentItemset()
 {
-    QString projectRoot = QCoreApplication::applicationDirPath() + "/../";
-    QString absoluteRootPath = QDir(projectRoot).absolutePath();
+    QString absoluteRootPath = QDir(QCoreApplication::applicationDirPath() + "/../").absolutePath();
+    QString resourcesFreqPath = findResourcesFreqFolder(absoluteRootPath);
 
-    _inputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/";
-    _outputOpenFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/";
-    _inputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/input4_10000_fruit.txt";
-    _outputFilePath = absoluteRootPath + "/AssociationRules/resources/Frequent Itemset/output.txt";
+    if(!resourcesFreqPath.isEmpty()) {
+        _inputOpenFilePath = resourcesFreqPath + "/";
+        _outputOpenFilePath = resourcesFreqPath + "/";
+        _inputFilePath = resourcesFreqPath + "/input4_10000_fruit.txt";
+        _outputFilePath = resourcesFreqPath + "/output.txt";
+    } else {
+        QMessageBox::critical(nullptr, "Error", "Unable to find resources file, please choose it manually");
+        return;
+    }
 
     _nodeRadius = 25;
     _levelHeight = 130;
@@ -573,6 +578,20 @@ void FrequentItemset::onOpenOutputFileButtonClicked()
     if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFilePath))) {
         QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
     }
+}
+
+
+QString FrequentItemset::findResourcesFreqFolder(const QString &rootPath)
+{
+    QDirIterator it(rootPath, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    while(it.hasNext()) {
+        QString dirPath = it.next();
+        if(dirPath.endsWith("resources/FrequentItemset")) {
+            return dirPath;
+        }
+    }
+
+    return "";
 }
 
 

@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QDirIterator>
 #include <QGraphicsScene>
 #include <QPen>
 #include <QBrush>
@@ -54,6 +55,7 @@ private:
     QMap<int, QString> _itemMap;
 
     // Functions
+    QString findResourcesGridFolder(const QString &rootPath);
     bool readFile(QSet<int> &gridItems);
     QVector<QVector<int>> findAllSets(const QSet<int> &gridItems);
     QVector<int> findAllSupports(const QVector<QVector<int>> &gridSets);
