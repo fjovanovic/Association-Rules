@@ -3,19 +3,13 @@
 
 Grid::Grid()
 {
-    QString absoluteRootPath = QDir(QCoreApplication::applicationDirPath() + "/../").absolutePath();
-    QString resourcesGridPath = findResourcesGridFolder(absoluteRootPath);
+    QString runPath = QDir::currentPath();
 
-    if(!resourcesGridPath.isEmpty()) {
-        _inputOpenFilePath = resourcesGridPath + "/";
-        _outputOpenFilePath = resourcesGridPath + "/";
-        _inputFilePath = resourcesGridPath + "/input4_100000_fruit.txt";
-        _outputFrequentFilePath = resourcesGridPath + "/output_frequent.txt";
-        _outputRareFilePath = resourcesGridPath + "/output_rare.txt";
-    } else {
-        QMessageBox::critical(nullptr, "Error", "Unable to find resources file, please choose it manually");
-        return;
-    }
+    _inputOpenFilePath = runPath + "/resources/Grid/";
+    _outputOpenFilePath = runPath + "/resources/Grid/";
+    _inputFilePath = runPath + "/resources/Grid/input4_100000_fruit.txt";
+    _outputFrequentFilePath = runPath + "/resources/Grid/output_frequent.txt";
+    _outputRareFilePath = runPath + "/resources/Grid/output_rare.txt";
 
     _gridWidth = 0;
 
@@ -169,20 +163,6 @@ void Grid::onFrequentItemsButtonClicked()
     if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputFrequentFilePath))) {
         QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
     }
-}
-
-
-QString Grid::findResourcesGridFolder(const QString &rootPath)
-{
-    QDirIterator it(rootPath, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    while(it.hasNext()) {
-        QString dirPath = it.next();
-        if(dirPath.endsWith("resources/Grid")) {
-            return dirPath;
-        }
-    }
-
-    return "";
 }
 
 

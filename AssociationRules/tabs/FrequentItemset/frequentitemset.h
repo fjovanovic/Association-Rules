@@ -5,7 +5,6 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QDirIterator>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 #include <QMap>
@@ -66,7 +65,6 @@ private:
     QMap<QVector<int>, QVector<int>> _nodePointers;
 
     // Functions
-    QString findResourcesFreqFolder(const QString &rootPath);
     bool readFile();
     void findItemFrequencies();
     void sortTransactions();
