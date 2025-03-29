@@ -1,4 +1,4 @@
-build-AssociationRules*/
+**/build*/
 **/resources/*/*
 !**/resources/*/input*.txt
 
