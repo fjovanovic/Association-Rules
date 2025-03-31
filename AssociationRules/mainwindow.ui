@@ -39,13 +39,13 @@
            <widget class="QLabel" name="freqInputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>150</width>
+              <width>185</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>150</width>
+              <width>185</width>
               <height>30</height>
              </size>
             </property>
@@ -100,13 +100,13 @@
            <widget class="QLabel" name="freqOutputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>150</width>
+              <width>185</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>150</width>
+              <width>185</width>
               <height>30</height>
              </size>
             </property>
@@ -155,13 +155,13 @@
            <widget class="QLabel" name="freqSetParametersLabel">
             <property name="minimumSize">
              <size>
-              <width>150</width>
+              <width>185</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>150</width>
+              <width>185</width>
               <height>30</height>
              </size>
             </property>
@@ -237,6 +237,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QGraphicsView" name="freqGraphicsView">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: #2F2F2F;</string>
             </property>
@@ -248,7 +254,7 @@
              <number>15</number>
             </property>
             <property name="sizeConstraint">
-             <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+             <enum>QLayout::SetMaximumSize</enum>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -257,9 +263,9 @@
              <number>0</number>
             </property>
             <item>
-             <spacer name="verticalSpacer_2">
+             <spacer name="verticalSpacer_freq1">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -352,9 +358,9 @@
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer">
+             <spacer name="verticalSpacer_freq2">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -390,7 +396,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
