@@ -120,6 +120,11 @@ void FrequentItemset::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const d
 
 void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
 {
+    if(_transactions.size() == 0) {
+        QMessageBox::critical(nullptr, "Error", "Run the algorithm first");
+        return;
+    }
+
     if(_treeBuilt) {
         QMessageBox::critical(nullptr, "Error", "The tree is already built");
         clearTransactionsLegend(scene);
@@ -149,11 +154,17 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
 
         QGraphicsTextItem *itemText1 = scene->addText(legendText1);
         QGraphicsTextItem *itemText2 = scene->addText(legendText2);
-        QFont font = itemText1->font();
-        font.setBold(true);
-        itemText1->setFont(font);
+        QFont boldFont = itemText1->font();
+        boldFont.setBold(true);
+        boldFont.setPointSize(9);
+        QFont normalFont = itemText2->font();
+        normalFont.setPointSize(9);
+        itemText1->setFont(boldFont);
         itemText1->setPos(rectX, yOffset);
+        itemText1->setDefaultTextColor(Qt::black);
+        itemText2->setFont(normalFont);
         itemText2->setPos(rectX, yOffset + 20);
+        itemText2->setDefaultTextColor(Qt::black);
     } else {
         QString legendText1 = "Tr" + QString::number(_currentTrIndex + 1) + ": ";
         QString legendText2 = "Tr" + QString::number(_currentTrIndex + 2) + ": ";
@@ -290,6 +301,11 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
 
 void FrequentItemset::onDrawFullTreeButtonClicked(QGraphicsScene *scene)
 {
+    if(_transactions.size() == 0) {
+        QMessageBox::critical(nullptr, "Error", "Run the algorithm first");
+        return;
+    }
+
     scene->clear();
     _pendingRemovalEllipses.clear();
     _childrenMapUp = _childrenMap;
@@ -360,6 +376,7 @@ void FrequentItemset::onDrawFullTreeButtonClicked(QGraphicsScene *scene)
                 nodePos.x() - textItem->boundingRect().width() / 2,
                 nodePos.y() - textItem->boundingRect().height() / 2
             );
+            textItem->setDefaultTextColor(Qt::black);
         }
     }
 
@@ -922,7 +939,7 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
     QPen textPen = QPen(Qt::black, 2);
     int yOffset = 10;
-    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 10;
     int legendX = (_maxWidth <= 300) ? 300 : (_maxWidth - 110);
     QGraphicsRectItem *legendItemsRect = scene->addRect(
         legendX,
@@ -937,7 +954,11 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
         int val = _itemsFrequencies.value(it.key());
         QString legendText = QString::number(it.key()) + ": " + it.value() + " (" + QString::number(val) + ")";
         QGraphicsTextItem *itemText = scene->addText(legendText);
+        QFont font = itemText->font();
+        font.setPointSize(9);
+        itemText->setFont(font);
         itemText->setPos(legendX, yOffset - 70);
+        itemText->setDefaultTextColor(Qt::black);
         yOffset += 20;
     }
 }
