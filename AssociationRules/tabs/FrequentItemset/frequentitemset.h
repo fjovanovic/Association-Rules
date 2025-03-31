@@ -62,7 +62,7 @@ private:
     QMap<QVector<int>, int> _frequentItemsets;
     QMap<int, QString> _itemMap;
     QMap<int, int> _widths;
-    QMap<QVector<int>, QVector<int>> _nodePointers;     // NEW
+    QMap<QVector<int>, QVector<int>> _nodePointers;
 
     // Functions
     bool readFile();
