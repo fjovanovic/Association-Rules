@@ -124,28 +124,36 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     QGraphicsRectItem *legendRect = scene->addRect(10 - (_gridWidth / 2), 10, 190, 85, _textPen, legendBrush);
     QGraphicsEllipseItem *closedItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 15, 15, 15, _textPen, _closedItemsetsBrush);
     QGraphicsTextItem *closedItemsetsText = scene->addText("Closed itemsets");
-    closedItemsetsText->setPos(30 - (_gridWidth / 2), 10);
+    QFont legendFont = closedItemsetsText->font();
+    legendFont.setPointSize(9);
+    closedItemsetsText->setFont(legendFont);
+    closedItemsetsText->setPos(30 - (_gridWidth / 2), 12);
     closedItemsetsText->setDefaultTextColor(Qt::black);
     QGraphicsEllipseItem *maximalItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 35, 15, 15, _textPen, _maximalItemsetsBrush);
     QGraphicsTextItem *maximalItemsetsText = scene->addText("Maximal itemsets");
-    maximalItemsetsText->setPos(30 - (_gridWidth / 2), 30);
+    maximalItemsetsText->setFont(legendFont);
+    maximalItemsetsText->setPos(30 - (_gridWidth / 2), 32);
     maximalItemsetsText->setDefaultTextColor(Qt::black);
     QGraphicsEllipseItem *closedAndMaximalItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 55, 15, 15, _textPen, _closedAndMaximalItemsetsBrush);
     QGraphicsTextItem *closedAndMaximalItemsetsText = scene->addText("Closed and maximal itemsets");
-    closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 50);
+    closedAndMaximalItemsetsText->setFont(legendFont);
+    closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 52);
     closedAndMaximalItemsetsText->setDefaultTextColor(Qt::black);
     QGraphicsEllipseItem *rareItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 75, 15, 15, _textPen, _rareItemsetsBrush);
     QGraphicsTextItem *rareItemsetsText = scene->addText("Rare itemsets");
-    rareItemsetsText->setPos(30 - (_gridWidth / 2), 70);
+    rareItemsetsText->setFont(legendFont);
+    rareItemsetsText->setPos(30 - (_gridWidth / 2), 72);
     rareItemsetsText->setDefaultTextColor(Qt::black);
 
-    int yOffset = 10;
-    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20);
-    QGraphicsRectItem *legendItemsRect = scene->addRect((_gridWidth / 2) - 110, 10, 100, legentItemsRectHeight, _textPen, legendBrush);
+    int yOffset = 11;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 5;
+    QGraphicsRectItem *legendItemsRect = scene->addRect((_gridWidth / 2) - 110, 10, 120, legentItemsRectHeight, _textPen, legendBrush);
     for(auto it = _itemMap.begin(); it != _itemMap.end(); ++it) {
         QString legendText = QString::number(it.key()) + ": " + it.value();
         QGraphicsTextItem *itemText = scene->addText(legendText);
+        itemText->setFont(legendFont);
         itemText->setPos((_gridWidth / 2) - 110, yOffset);
+        itemText->setDefaultTextColor(Qt::black);
         yOffset += 20;
     }
 
