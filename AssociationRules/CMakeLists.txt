@@ -62,6 +62,13 @@ set_target_properties(AssociationRules PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+# Add resources directory to release version
+add_custom_command(TARGET AssociationRules POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/resources"
+    "$<TARGET_FILE_DIR:AssociationRules>/resources"
+)
+
 include(GNUInstallDirs)
 install(TARGETS AssociationRules
     BUNDLE DESTINATION .
