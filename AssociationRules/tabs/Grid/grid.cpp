@@ -17,7 +17,7 @@ Grid::Grid()
     _rareItemsetsBrush = QBrush(Qt::gray, Qt::SolidPattern);
     _closedItemsetsBrush = QBrush(Qt::yellow, Qt::SolidPattern);
     _maximalItemsetsBrush = QBrush(Qt::green, Qt::SolidPattern);
-    _closedAndMaximalItemsetsBrush = QBrush(Qt::cyan, Qt::SolidPattern);
+    _closedAndMaximalItemsetsBrush = QBrush(Qt::red, Qt::SolidPattern);
     _textPen = QPen(Qt::black, 2);
 }
 
