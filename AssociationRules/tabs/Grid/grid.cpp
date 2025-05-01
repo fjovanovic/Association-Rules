@@ -318,7 +318,9 @@ QMap<QVector<int>, int> Grid::generateFrequentItemsets(const double minSupport)
 
     double transactionsSize = _transactions.size();
     for(auto it = frequentItemsets.begin(); it != frequentItemsets.end(); ) {
-        if((it.value() / transactionsSize) < minSupport) {
+        double setSupport = it.value() / transactionsSize;
+
+        if((setSupport - minSupport) < -0.00001) {
             it = frequentItemsets.erase(it);
         } else {
             it++;
