@@ -10,6 +10,8 @@
 #include <QMap>
 #include <QTextEdit>
 #include <QDesktopServices>
+#include <QGuiApplication>
+#include <QScreen>
 
 
 class FrequentItemset
@@ -33,6 +35,7 @@ public:
     void onDrawFullTreeButtonClicked(QGraphicsScene *scene);
     void onForwardButtonClicked(QGraphicsScene *scene);
     void onOpenOutputFileButtonClicked();
+    void onScreenshotButtonClicked(QWidget *mainWindow);
 
 private:
     // Fields

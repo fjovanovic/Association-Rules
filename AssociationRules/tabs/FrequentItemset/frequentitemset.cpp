@@ -592,6 +592,29 @@ void FrequentItemset::onOpenOutputFileButtonClicked()
 }
 
 
+void FrequentItemset::onScreenshotButtonClicked(QWidget *mainWindow)
+{
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if(!screen) {
+        QMessageBox::critical(nullptr, "Error", "Could not get primary screen");
+        return;
+    }
+
+    QPixmap pixmap = screen->grabWindow(mainWindow->winId());
+    QString filename = QFileDialog::getSaveFileName(
+        nullptr,
+        "Save Screenshot",
+        QDir::homePath() + "/screenshot_" + QDateTime::currentDateTime().toString("dd_MM_yyyy__HH_mm_ss") + ".png",
+        "Images (*.png *.xpm *.jpg)"
+    );
+
+    if(!filename.isEmpty()) {
+        pixmap.save(filename);
+    }
+
+}
+
+
 bool FrequentItemset::readFile()
 {
     QFile file(_inputFilePath);
@@ -939,7 +962,7 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
     QPen textPen = QPen(Qt::black, 2);
     int yOffset = 10;
-    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 10;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 5;
     int legendX = (_maxWidth <= 300) ? 300 : (_maxWidth - 110);
     QGraphicsRectItem *legendItemsRect = scene->addRect(
         legendX,
