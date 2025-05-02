@@ -331,7 +331,7 @@
         <item row="4" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -415,7 +415,29 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <widget class="QPushButton" name="gridScreenshotButton">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Screenshot</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="gridHorizontalSpacer02">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
@@ -460,7 +482,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

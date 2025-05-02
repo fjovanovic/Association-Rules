@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QScreen>
 
 #include "tabs/Grid/grid.h"
 
@@ -31,6 +32,7 @@ public slots:
     void gridOnRunAlgorithmButtonClicked();
     void gridOnFrequentItemsButtonClicked();
     void gridOnRareItemsButtonClicked();
+    void gridOnScreenshotButtonClicked();
 
 private:
     Ui::MainWindow *ui;

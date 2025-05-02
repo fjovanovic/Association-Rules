@@ -216,6 +216,28 @@ void Grid::onRareItemsButtonClicked()
 }
 
 
+void Grid::onScreenshotButtonClicked(const QWidget *mainWindow)
+{
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if(!screen) {
+        QMessageBox::critical(nullptr, "Error", "Could not get primary screen");
+        return;
+    }
+
+    QPixmap pixmap = screen->grabWindow(mainWindow->winId());
+    QString filename = QFileDialog::getSaveFileName(
+        nullptr,
+        "Save Screenshot",
+        QDir::homePath() + "/screenshot_" + QDateTime::currentDateTime().toString("dd_MM_yyyy__HH_mm_ss") + ".png",
+        "Images (*.png *.xpm *.jpg)"
+    );
+
+    if(!filename.isEmpty()) {
+        pixmap.save(filename);
+    }
+}
+
+
 bool Grid::readFile(QSet<int> &gridItems)
 {
     QFile file(_inputFilePath);

@@ -13,6 +13,8 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsTextItem>
 #include <QMap>
+#include <QGuiApplication>
+#include <QScreen>
 
 #include <cmath>
 
@@ -35,6 +37,7 @@ public:
     void onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport);
     void onFrequentItemsButtonClicked();
     void onRareItemsButtonClicked();
+    void onScreenshotButtonClicked(const QWidget *mainWindow);
 
 private:
     // Fields
