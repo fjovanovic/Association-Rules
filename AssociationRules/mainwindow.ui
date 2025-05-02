@@ -249,12 +249,12 @@
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0">
+           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0">
             <property name="spacing">
              <number>15</number>
             </property>
             <property name="sizeConstraint">
-             <enum>QLayout::SetMaximumSize</enum>
+             <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -265,7 +265,7 @@
             <item>
              <spacer name="verticalSpacer_freq1">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -358,9 +358,28 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="freqScreenshotButton">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Screenshot</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer_freq2">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Orientation::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -396,7 +415,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

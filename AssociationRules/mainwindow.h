@@ -31,6 +31,7 @@ public slots:
     void freqOnDrawFullTreeButtonClicked();
     void freqOnForwardButtonClicked();
     void freqOnOpenOutputFileButtonClicked();
+    void freqOnScreenshotButtonClicked();
 
 private:
     Ui::MainWindow *ui;

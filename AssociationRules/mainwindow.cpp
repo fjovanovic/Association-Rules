@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->freqDrawFullTreeButton, &QPushButton::clicked, this, &MainWindow::freqOnDrawFullTreeButtonClicked);
     connect(ui->freqForwardButton, &QPushButton::clicked, this, &MainWindow::freqOnForwardButtonClicked);
     connect(ui->freqOpenOutputFileButton, &QPushButton::clicked, this, &MainWindow::freqOnOpenOutputFileButtonClicked);
+    connect(ui->freqScreenshotButton, &QPushButton::clicked, this, &MainWindow::freqOnScreenshotButtonClicked);
 }
 
 
@@ -180,6 +181,20 @@ void MainWindow::freqOnOpenOutputFileButtonClicked()
 
     setCursor(Qt::ArrowCursor);
     ui->freqOpenOutputFileButton->setDisabled(false);
+}
+
+
+void MainWindow::freqOnScreenshotButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqScreenshotButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    QWidget *mainWindow = this->window();
+    _frequentItemsetTab->onScreenshotButtonClicked(mainWindow);
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqScreenshotButton->setDisabled(false);
 }
 
 
