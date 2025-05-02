@@ -13,11 +13,11 @@ Grid::Grid()
 
     _gridWidth = 0;
 
-    _closedAndMaximalItemsetsBrush = QBrush(Qt::cyan, Qt::SolidPattern);
-    _maximalItemsetsBrush = QBrush(Qt::green, Qt::SolidPattern);
-    _closedItemsetsBrush = QBrush(Qt::yellow, Qt::SolidPattern);
     _frequentItemsetsBrush = QBrush(Qt::white, Qt::SolidPattern);
     _rareItemsetsBrush = QBrush(Qt::gray, Qt::SolidPattern);
+    _closedItemsetsBrush = QBrush(Qt::yellow, Qt::SolidPattern);
+    _maximalItemsetsBrush = QBrush(Qt::green, Qt::SolidPattern);
+    _closedAndMaximalItemsetsBrush = QBrush(Qt::red, Qt::SolidPattern);
     _textPen = QPen(Qt::black, 2);
 }
 
@@ -121,29 +121,63 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     drawGrid(scene, gridSets, childrenMap, gridSupports, frequentKeys, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
 
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
-    QGraphicsRectItem *legendRect = scene->addRect(10 - (_gridWidth / 2), 10, 190, 85, _textPen, legendBrush);
-    QGraphicsEllipseItem *closedItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 15, 15, 15, _textPen, _closedItemsetsBrush);
-    QGraphicsTextItem *closedItemsetsText = scene->addText("Closed itemsets");
-    QFont legendFont = closedItemsetsText->font();
+    QGraphicsRectItem *legendRect = scene->addRect(
+        10 - (_gridWidth / 2), 10,
+        190, 105,
+        _textPen, legendBrush
+    );
+
+    QGraphicsEllipseItem *frequentItemsetsEllipse = scene->addEllipse(
+        15 - (_gridWidth / 2), 15,
+        15, 15,
+        _textPen, _frequentItemsetsBrush
+    );
+    QGraphicsTextItem *frequentItemsetsText = scene->addText("Frequent itemsets");
+    QFont legendFont = frequentItemsetsText->font();
     legendFont.setPointSize(9);
-    closedItemsetsText->setFont(legendFont);
-    closedItemsetsText->setPos(30 - (_gridWidth / 2), 12);
-    closedItemsetsText->setDefaultTextColor(Qt::black);
-    QGraphicsEllipseItem *maximalItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 35, 15, 15, _textPen, _maximalItemsetsBrush);
-    QGraphicsTextItem *maximalItemsetsText = scene->addText("Maximal itemsets");
-    maximalItemsetsText->setFont(legendFont);
-    maximalItemsetsText->setPos(30 - (_gridWidth / 2), 32);
-    maximalItemsetsText->setDefaultTextColor(Qt::black);
-    QGraphicsEllipseItem *closedAndMaximalItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 55, 15, 15, _textPen, _closedAndMaximalItemsetsBrush);
-    QGraphicsTextItem *closedAndMaximalItemsetsText = scene->addText("Closed and maximal itemsets");
-    closedAndMaximalItemsetsText->setFont(legendFont);
-    closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 52);
-    closedAndMaximalItemsetsText->setDefaultTextColor(Qt::black);
-    QGraphicsEllipseItem *rareItemsetsEllipse = scene->addEllipse(15 - (_gridWidth / 2), 75, 15, 15, _textPen, _rareItemsetsBrush);
+    frequentItemsetsText->setFont(legendFont);
+    frequentItemsetsText->setPos(30 - (_gridWidth / 2), 12);
+    frequentItemsetsText->setDefaultTextColor(Qt::black);
+
+    QGraphicsEllipseItem *rareItemsetsEllipse = scene->addEllipse(
+        15 - (_gridWidth / 2), 35,
+        15, 15,
+        _textPen, _rareItemsetsBrush
+    );
     QGraphicsTextItem *rareItemsetsText = scene->addText("Rare itemsets");
     rareItemsetsText->setFont(legendFont);
-    rareItemsetsText->setPos(30 - (_gridWidth / 2), 72);
+    rareItemsetsText->setPos(30 - (_gridWidth / 2), 32);
     rareItemsetsText->setDefaultTextColor(Qt::black);
+
+    QGraphicsEllipseItem *closedItemsetsEllipse = scene->addEllipse(
+        15 - (_gridWidth / 2), 55,
+        15, 15,
+        _textPen, _closedItemsetsBrush
+    );
+    QGraphicsTextItem *closedItemsetsText = scene->addText("Closed itemsets");
+    closedItemsetsText->setFont(legendFont);
+    closedItemsetsText->setPos(30 - (_gridWidth / 2), 52);
+    closedItemsetsText->setDefaultTextColor(Qt::black);
+
+    QGraphicsEllipseItem *maximalItemsetsEllipse = scene->addEllipse(
+        15 - (_gridWidth / 2), 75,
+        15, 15,
+        _textPen, _maximalItemsetsBrush
+    );
+    QGraphicsTextItem *maximalItemsetsText = scene->addText("Maximal itemsets");
+    maximalItemsetsText->setFont(legendFont);
+    maximalItemsetsText->setPos(30 - (_gridWidth / 2), 72);
+    maximalItemsetsText->setDefaultTextColor(Qt::black);
+
+    QGraphicsEllipseItem *closedAndMaximalItemsetsEllipse = scene->addEllipse(
+        15 - (_gridWidth / 2), 95,
+        15, 15,
+        _textPen, _closedAndMaximalItemsetsBrush
+    );
+    QGraphicsTextItem *closedAndMaximalItemsetsText = scene->addText("Closed and maximal itemsets");
+    closedAndMaximalItemsetsText->setFont(legendFont);
+    closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 92);
+    closedAndMaximalItemsetsText->setDefaultTextColor(Qt::black);
 
     int yOffset = 11;
     int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 5;
@@ -178,6 +212,28 @@ void Grid::onRareItemsButtonClicked()
 {
     if(!QDesktopServices::openUrl(QUrl::fromLocalFile(_outputRareFilePath))) {
         QMessageBox::critical(nullptr, "Error", "Unable to read from output file");
+    }
+}
+
+
+void Grid::onScreenshotButtonClicked(const QWidget *mainWindow)
+{
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if(!screen) {
+        QMessageBox::critical(nullptr, "Error", "Could not get primary screen");
+        return;
+    }
+
+    QPixmap pixmap = screen->grabWindow(mainWindow->winId());
+    QString filename = QFileDialog::getSaveFileName(
+        nullptr,
+        "Save Screenshot",
+        QDir::homePath() + "/screenshot_" + QDateTime::currentDateTime().toString("dd_MM_yyyy__HH_mm_ss") + ".png",
+        "Images (*.png *.xpm *.jpg)"
+    );
+
+    if(!filename.isEmpty()) {
+        pixmap.save(filename);
     }
 }
 
@@ -318,7 +374,9 @@ QMap<QVector<int>, int> Grid::generateFrequentItemsets(const double minSupport)
 
     double transactionsSize = _transactions.size();
     for(auto it = frequentItemsets.begin(); it != frequentItemsets.end(); ) {
-        if((it.value() / transactionsSize) < minSupport) {
+        double setSupport = it.value() / transactionsSize;
+
+        if((setSupport - minSupport) < -0.00001) {
             it = frequentItemsets.erase(it);
         } else {
             it++;

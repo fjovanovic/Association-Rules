@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QScreen>
 
 #include "tabs/Grid/grid.h"
 #include "tabs/FrequentItemset/frequentitemset.h"
@@ -32,6 +33,7 @@ public slots:
     void gridOnRunAlgorithmButtonClicked();
     void gridOnFrequentItemsButtonClicked();
     void gridOnRareItemsButtonClicked();
+    void gridOnScreenshotButtonClicked();
 
     void freqOnBrowseButtonClicked();
     void freqOnChangeButtonClicked();

@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->gridRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::gridOnRunAlgorithmButtonClicked);
     connect(ui->gridFrequentItemsButton, &QPushButton::clicked, this, &MainWindow::gridOnFrequentItemsButtonClicked);
     connect(ui->gridRareItemsButton, &QPushButton::clicked, this, &MainWindow::gridOnRareItemsButtonClicked);
+    connect(ui->gridScreenshotButton, &QPushButton::clicked, this, &MainWindow::gridOnScreenshotButtonClicked);
 
     connect(ui->freqBrowseButton, &QPushButton::clicked, this, &MainWindow::freqOnBrowseButtonClicked);
     connect(ui->freqChangeButton, &QPushButton::clicked, this, &MainWindow::freqOnChangeButtonClicked);
@@ -172,6 +173,20 @@ void MainWindow::gridOnRareItemsButtonClicked()
 
     setCursor(Qt::ArrowCursor);
     ui->gridRareItemsButton->setDisabled(false);
+}
+
+
+void MainWindow::gridOnScreenshotButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->gridScreenshotButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    QWidget *mainWindow = this->window();
+    _gridTab->onScreenshotButtonClicked(mainWindow);
+
+    setCursor(Qt::ArrowCursor);
+    ui->gridScreenshotButton->setDisabled(false);
 }
 
 
