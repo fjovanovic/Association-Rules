@@ -37,7 +37,7 @@ public:
     void onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport);
     void onFrequentItemsButtonClicked();
     void onRareItemsButtonClicked();
-    void onScreenshotButtonClicked(const QWidget *mainWindow);
+    void onScreenshotButtonClicked(QWidget *mainWindow);
 
 private:
     // Fields
