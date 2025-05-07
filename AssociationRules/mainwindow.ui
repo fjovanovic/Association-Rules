@@ -56,6 +56,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Choose input file:</string>
             </property>
@@ -75,6 +78,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -93,6 +99,9 @@
               <width>120</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Browse</string>
@@ -117,6 +126,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Frequent items output file:</string>
             </property>
@@ -136,6 +148,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -154,6 +169,9 @@
               <width>120</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Change</string>
@@ -178,6 +196,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Rare items output file:</string>
             </property>
@@ -197,6 +218,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -215,6 +239,9 @@
               <width>120</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Change</string>
@@ -241,6 +268,9 @@
               <width>185</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Set parameters:</string>
@@ -269,6 +299,9 @@
             </property>
             <property name="accessibleName">
              <string/>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="rowCount">
              <number>1</number>
@@ -321,6 +354,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Run Algorithm</string>
             </property>
@@ -331,7 +367,7 @@
         <item row="4" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="sizeConstraint">
-           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+           <enum>QLayout::SetDefaultConstraint</enum>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -359,6 +395,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Open output file:</string>
             </property>
@@ -383,6 +422,9 @@
               <width>120</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Frequent items</string>
@@ -409,6 +451,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Rare items</string>
             </property>
@@ -428,6 +473,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Screenshot</string>
             </property>
@@ -435,9 +483,6 @@
           </item>
           <item>
            <spacer name="gridHorizontalSpacer02">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
@@ -482,7 +527,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

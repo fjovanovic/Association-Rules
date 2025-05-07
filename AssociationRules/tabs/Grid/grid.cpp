@@ -121,68 +121,71 @@ void Grid::onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSu
     drawGrid(scene, gridSets, childrenMap, gridSupports, frequentKeys, closedItemsets, maximalItemsets, closedAndMaximalItemsets);
 
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
+    QFont legendFont = QFont("Serif", 9);
     QGraphicsRectItem *legendRect = scene->addRect(
-        10 - (_gridWidth / 2), 10,
-        190, 105,
+        5 - (_gridWidth / 2), 5,
+        205, 105,
         _textPen, legendBrush
     );
 
     QGraphicsEllipseItem *frequentItemsetsEllipse = scene->addEllipse(
-        15 - (_gridWidth / 2), 15,
+        10 - (_gridWidth / 2), 10,
         15, 15,
         _textPen, _frequentItemsetsBrush
     );
     QGraphicsTextItem *frequentItemsetsText = scene->addText("Frequent itemsets");
-    QFont legendFont = frequentItemsetsText->font();
-    legendFont.setPointSize(9);
     frequentItemsetsText->setFont(legendFont);
-    frequentItemsetsText->setPos(30 - (_gridWidth / 2), 12);
+    frequentItemsetsText->setPos(25 - (_gridWidth / 2), 7);
     frequentItemsetsText->setDefaultTextColor(Qt::black);
 
     QGraphicsEllipseItem *rareItemsetsEllipse = scene->addEllipse(
-        15 - (_gridWidth / 2), 35,
+        10 - (_gridWidth / 2), 30,
         15, 15,
         _textPen, _rareItemsetsBrush
     );
     QGraphicsTextItem *rareItemsetsText = scene->addText("Rare itemsets");
     rareItemsetsText->setFont(legendFont);
-    rareItemsetsText->setPos(30 - (_gridWidth / 2), 32);
+    rareItemsetsText->setPos(25 - (_gridWidth / 2), 27);
     rareItemsetsText->setDefaultTextColor(Qt::black);
 
     QGraphicsEllipseItem *closedItemsetsEllipse = scene->addEllipse(
-        15 - (_gridWidth / 2), 55,
+        10 - (_gridWidth / 2), 50,
         15, 15,
         _textPen, _closedItemsetsBrush
     );
     QGraphicsTextItem *closedItemsetsText = scene->addText("Closed itemsets");
     closedItemsetsText->setFont(legendFont);
-    closedItemsetsText->setPos(30 - (_gridWidth / 2), 52);
+    closedItemsetsText->setPos(25 - (_gridWidth / 2), 47);
     closedItemsetsText->setDefaultTextColor(Qt::black);
 
     QGraphicsEllipseItem *maximalItemsetsEllipse = scene->addEllipse(
-        15 - (_gridWidth / 2), 75,
+        10 - (_gridWidth / 2), 70,
         15, 15,
         _textPen, _maximalItemsetsBrush
     );
     QGraphicsTextItem *maximalItemsetsText = scene->addText("Maximal itemsets");
     maximalItemsetsText->setFont(legendFont);
-    maximalItemsetsText->setPos(30 - (_gridWidth / 2), 72);
+    maximalItemsetsText->setPos(25 - (_gridWidth / 2), 67);
     maximalItemsetsText->setDefaultTextColor(Qt::black);
 
     QGraphicsEllipseItem *closedAndMaximalItemsetsEllipse = scene->addEllipse(
-        15 - (_gridWidth / 2), 95,
+        10 - (_gridWidth / 2), 90,
         15, 15,
         _textPen, _closedAndMaximalItemsetsBrush
     );
     QGraphicsTextItem *closedAndMaximalItemsetsText = scene->addText("Closed and maximal itemsets");
     closedAndMaximalItemsetsText->setFont(legendFont);
-    closedAndMaximalItemsetsText->setPos(30 - (_gridWidth / 2), 92);
+    closedAndMaximalItemsetsText->setPos(25 - (_gridWidth / 2), 87);
     closedAndMaximalItemsetsText->setDefaultTextColor(Qt::black);
 
-    int yOffset = 11;
-    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 5;
-    QGraphicsRectItem *legendItemsRect = scene->addRect((_gridWidth / 2) - 110, 10, 120, legentItemsRectHeight, _textPen, legendBrush);
-    for(auto it = _itemMap.begin(); it != _itemMap.end(); ++it) {
+    int yOffset = 6;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) + 5;
+    QGraphicsRectItem *legendItemsRect = scene->addRect(
+        (_gridWidth / 2) - 110, 5,
+        120, legentItemsRectHeight,
+        _textPen, legendBrush
+    );
+    for(auto it = _itemMap.begin(); it != _itemMap.end(); it++) {
         QString legendText = QString::number(it.key()) + ": " + it.value();
         QGraphicsTextItem *itemText = scene->addText(legendText);
         itemText->setFont(legendFont);
@@ -519,8 +522,7 @@ void Grid::drawGrid(
 
             if(index == 0) {
                 QGraphicsTextItem *rootText = scene->addText("null");
-                QFont font = rootText->font();
-                font.setPointSize(7);
+                QFont font = QFont("Serif", 7);
                 rootText->setFont(font);
                 rootText->setPos(x - rootText->boundingRect().width() / 2, y - rootText->boundingRect().height() / 2);
                 rootText->setDefaultTextColor(Qt::black);
@@ -543,14 +545,13 @@ void Grid::drawGrid(
                 }
 
                 QGraphicsTextItem *setText = scene->addText(setStr);
-                QFont font = setText->font();
-                font.setPointSize(7);
+                QFont font = QFont("Serif", 7);
                 setText->setFont(font);
                 setText->setPos(x - setText->boundingRect().width() / 2, y - setText->boundingRect().height() / 2 - 5);
                 setText->setDefaultTextColor(Qt::black);
 
                 double supportPerc = (gridSupports[index] / static_cast<double>(_transactions.size())) * 100;
-                QString supportStr = "(" + QString::number(supportPerc) + " %)";
+                QString supportStr = "(" + QString::number(supportPerc, 'f', 2) + " %)";
                 QGraphicsTextItem *supportText = scene->addText(supportStr);
                 supportText->setFont(font);
                 supportText->setPos(x - supportText->boundingRect().width() / 2, y - supportText->boundingRect().height() / 2 + 5);
