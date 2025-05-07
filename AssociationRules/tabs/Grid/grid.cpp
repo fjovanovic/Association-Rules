@@ -216,15 +216,26 @@ void Grid::onRareItemsButtonClicked()
 }
 
 
-void Grid::onScreenshotButtonClicked(const QWidget *mainWindow)
+void Grid::onScreenshotButtonClicked(QWidget *mainWindow)
 {
-    QScreen *screen = QGuiApplication::primaryScreen();
-    if(!screen) {
-        QMessageBox::critical(nullptr, "Error", "Could not get primary screen");
+    if(!mainWindow || !mainWindow->isVisible()) {
+        QMessageBox::critical(nullptr, "Error", "Main window is not valid or not visible");
         return;
     }
 
-    QPixmap pixmap = screen->grabWindow(mainWindow->winId());
+    QScreen *screen = mainWindow->screen();
+    if(!screen) {
+        QMessageBox::critical(nullptr, "Error", "Could not get active screen");
+        return;
+    }
+
+
+    QPixmap pixmap = mainWindow->grab();
+    if(pixmap.isNull()) {
+        QMessageBox::critical(nullptr, "Error", "Failed to grab screenshot");
+        return;
+    }
+
     QString filename = QFileDialog::getSaveFileName(
         nullptr,
         "Save Screenshot",
@@ -233,7 +244,11 @@ void Grid::onScreenshotButtonClicked(const QWidget *mainWindow)
     );
 
     if(!filename.isEmpty()) {
-        pixmap.save(filename);
+        if(!pixmap.save(filename)) {
+            QMessageBox::critical(nullptr, "Error", "Failed to save screenshot");
+        }
+    } else {
+        QMessageBox::critical(nullptr, "Error", "Failed to save screenshot");
     }
 }
 
