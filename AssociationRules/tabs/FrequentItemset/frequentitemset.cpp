@@ -154,11 +154,9 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
 
         QGraphicsTextItem *itemText1 = scene->addText(legendText1);
         QGraphicsTextItem *itemText2 = scene->addText(legendText2);
-        QFont boldFont = itemText1->font();
+        QFont boldFont = QFont("Serif", 7);
         boldFont.setBold(true);
-        boldFont.setPointSize(9);
-        QFont normalFont = itemText2->font();
-        normalFont.setPointSize(9);
+        QFont normalFont = QFont("Serif", 7);
         itemText1->setFont(boldFont);
         itemText1->setPos(rectX, yOffset);
         itemText1->setDefaultTextColor(Qt::black);
@@ -275,8 +273,7 @@ void FrequentItemset::onDrawTransactionButtonClicked(QGraphicsScene *scene)
 
             QString nodeText = QString::number(currentSet.last()) + ": " + QString::number(freq);
             QGraphicsTextItem *text = scene->addText(nodeText);
-            QFont font = text->font();
-            font.setPointSize(7);
+            QFont font = QFont("Serif", 7);
             text->setFont(font);
             text->setPos(
                 nodePos.x() - text->boundingRect().width() / 2,
@@ -317,8 +314,7 @@ void FrequentItemset::onDrawFullTreeButtonClicked(QGraphicsScene *scene)
         QPen(Qt::black), QBrush(Qt::white)
     );
     QGraphicsTextItem *rootText = scene->addText("null");
-    QFont font = rootText->font();
-    font.setPointSize(7);
+    QFont font = QFont("Serif", 7);
     rootText->setFont(font);
     rootText->setPos(
         _rootPos.x() - rootText->boundingRect().width() / 2,
@@ -369,8 +365,7 @@ void FrequentItemset::onDrawFullTreeButtonClicked(QGraphicsScene *scene)
 
             QString nodeText = QString::number(nodeKey.last()) + ": " + QString::number(_nodesSupport[nodeKey]);
             QGraphicsTextItem *textItem = scene->addText(nodeText);
-            QFont font = textItem->font();
-            font.setPointSize(7);
+            QFont font = QFont("Serif", 7);
             textItem->setFont(font);
             textItem->setPos(
                 nodePos.x() - textItem->boundingRect().width() / 2,
@@ -894,8 +889,7 @@ void FrequentItemset::configTree(QGraphicsScene *scene)
         QPen(Qt::black), QBrush(Qt::white)
     );
     QGraphicsTextItem *rootText = scene->addText("null");
-    QFont font = rootText->font();
-    font.setPointSize(7);
+    QFont font = QFont("Serif", 7);
     rootText->setFont(font);
     rootText->setPos(
         _rootPos.x() - rootText->boundingRect().width() / 2,
@@ -976,7 +970,7 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
     QBrush legendBrush = QBrush(Qt::white, Qt::SolidPattern);
     QPen textPen = QPen(Qt::black, 2);
     int yOffset = 10;
-    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 5;
+    int legentItemsRectHeight = (3 * yOffset) + ((_itemMap.size() - 1) * 20) - 10;
     int legendX = (_maxWidth <= 300) ? 300 : (_maxWidth - 110);
     QGraphicsRectItem *legendItemsRect = scene->addRect(
         legendX,
@@ -991,8 +985,7 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
         int val = _itemsFrequencies.value(it.key());
         QString legendText = QString::number(it.key()) + ": " + it.value() + " (" + QString::number(val) + ")";
         QGraphicsTextItem *itemText = scene->addText(legendText);
-        QFont font = itemText->font();
-        font.setPointSize(9);
+        QFont font = QFont("Serif", 7);
         itemText->setFont(font);
         itemText->setPos(legendX, yOffset - 70);
         itemText->setDefaultTextColor(Qt::black);
