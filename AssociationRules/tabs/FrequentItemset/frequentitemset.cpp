@@ -975,7 +975,7 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
     QGraphicsRectItem *legendItemsRect = scene->addRect(
         legendX,
         -60,
-        130,
+        150,
         legentItemsRectHeight,
         textPen,
         legendBrush
@@ -985,7 +985,7 @@ void FrequentItemset::drawItemsLegend(QGraphicsScene *scene)
         int val = _itemsFrequencies.value(it.key());
         QString legendText = QString::number(it.key()) + ": " + it.value() + " (" + QString::number(val) + ")";
         QGraphicsTextItem *itemText = scene->addText(legendText);
-        QFont font = QFont("Serif", 7);
+        QFont font = QFont("Serif", 9);
         itemText->setFont(font);
         itemText->setPos(legendX, yOffset - 70);
         itemText->setDefaultTextColor(Qt::black);
