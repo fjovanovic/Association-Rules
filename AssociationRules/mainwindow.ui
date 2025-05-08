@@ -46,15 +46,18 @@
            <widget class="QLabel" name="gridInputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Choose input file:</string>
@@ -75,6 +78,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -94,6 +100,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Browse</string>
             </property>
@@ -107,15 +116,18 @@
            <widget class="QLabel" name="gridOutputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Frequent items output file:</string>
@@ -136,6 +148,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -155,6 +170,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Change</string>
             </property>
@@ -168,15 +186,18 @@
            <widget class="QLabel" name="label_2">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Rare items output file:</string>
@@ -197,6 +218,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -216,6 +240,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Change</string>
             </property>
@@ -232,15 +259,18 @@
            <widget class="QLabel" name="gridSetParametersLabel">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Set parameters:</string>
@@ -269,6 +299,9 @@
             </property>
             <property name="accessibleName">
              <string/>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="rowCount">
              <number>1</number>
@@ -321,6 +354,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Run Algorithm</string>
             </property>
@@ -331,7 +367,7 @@
         <item row="4" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_41">
           <property name="sizeConstraint">
-           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+           <enum>QLayout::SetDefaultConstraint</enum>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -349,15 +385,18 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Open output file:</string>
@@ -384,6 +423,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Frequent items</string>
             </property>
@@ -409,6 +451,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Rare items</string>
             </property>
@@ -428,15 +473,18 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Screenshot</string>
             </property>
            </widget>
           </item>
           <item>
-           <spacer name="gridHorizontalSpacer02">
+           <spacer name="gridHorizontalSpacer05">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
