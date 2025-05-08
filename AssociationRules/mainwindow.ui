@@ -46,13 +46,13 @@
            <widget class="QLabel" name="gridInputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
@@ -116,13 +116,13 @@
            <widget class="QLabel" name="gridOutputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
@@ -186,13 +186,13 @@
            <widget class="QLabel" name="label_2">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
@@ -259,13 +259,13 @@
            <widget class="QLabel" name="gridSetParametersLabel">
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
@@ -385,13 +385,13 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>185</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
@@ -482,7 +482,10 @@
            </widget>
           </item>
           <item>
-           <spacer name="gridHorizontalSpacer02">
+           <spacer name="gridHorizontalSpacer05">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
