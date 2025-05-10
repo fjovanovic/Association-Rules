@@ -113,7 +113,7 @@ maximal, closed and maximal sets of items
 - On the image below we can see an example of the grid from 
 one of the input data for 0.12 (12%) minimum support 
 
-<center><img src="examples/grid1.png" width="600"/></center>  
+<div align="center"><img src="examples/grid1.png" width="600"/></div>
 
 - Field `Choose input file` is the file with input data
 - Field `Frequent items output file` is the file where 
@@ -143,21 +143,21 @@ that is mapping numbers to the items (represented in the node)
 FP tree, as each item is being added number of that prefix 
 is being increased
 
-<center><img src="examples/freq1.png" width="600"/></center> 
+<div align="center"><img src="examples/freq1.png" width="600"/></div> 
 
 - `Draw full tree` button will draw full tree
 
-<center><img src="examples/freq2.png" width="600"/></center> 
+<div align="center"><img src="examples/freq2.png" width="600"/></div> 
 
 - `Forward` button will at first interaction color the nodes, show 
 candidates with their support and choose frequent out of all of them 
 
-<center><img src="examples/freq3.png" width="600"/></center> 
+<div align="center"><img src="examples/freq3.png" width="600"/></div> 
 
 - At the second interaction the nodes will be removed. This will repeat 
 until we are left with only null node
 
-<center><img src="examples/freq4.png" width="600"/></center> 
+<div align="center"><img src="examples/freq4.png" width="600"/></div> 
 
 - `Open output file` will open file that contains frequent sets 
 of items with their support
