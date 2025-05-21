@@ -609,6 +609,16 @@
              </item>
              <item>
               <property name="text">
+               <string>Jaccard coefficient</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mahalanobis Distance</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Hamming Distance</string>
               </property>
              </item>
@@ -687,6 +697,27 @@
            </item>
            <item>
             <widget class="QPushButton" name="pbChooseApr">
+             <property name="text">
+              <string>Choose</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Choose output file</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lePbOutputRare"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbChooseOutput">
              <property name="text">
               <string>Choose</string>
              </property>

@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pbCompute, &QPushButton::clicked, this, &MainWindow::pbCompute);
     connect(ui->pbChooseApr, &QPushButton::clicked, this, &MainWindow::pbChooseApr);
     connect(ui->pbFindRare, &QPushButton::clicked, this, &MainWindow::pbFindRare);
-
+    connect(ui->pbChooseOutput, &QPushButton::clicked, this, &MainWindow::pbChooseOutput);
 }
 
 
@@ -286,6 +286,37 @@ int MainWindow::hammingDistance(const QVector<double> &vec1, const QVector<doubl
     return distance;
 }
 
+double MainWindow::jaccardCoefficient(const QVector<double> &vec1, const QVector<double> &vec2)
+{
+    if (vec1.size() != vec2.size()) {
+        qWarning() << "Vektori nisu iste dužine!";
+            return -1.0;  // Greška
+    }
+
+    int m11 = 0; // Broj pozicija gde su oba 1
+    int m10 = 0; // Broj pozicija gde je vec1=1, vec2=0
+    int m01 = 0; // Broj pozicija gde je vec1=0, vec2=1
+
+    for (int i = 0; i < vec1.size(); ++i) {
+        if (vec1[i] == 1.0 && vec2[i] == 1.0) {
+            m11++;
+        } else if (vec1[i] == 1.0 && vec2[i] == 0.0) {
+            m10++;
+        } else if (vec1[i] == 0.0 && vec2[i] == 1.0) {
+            m01++;
+        }
+        // (0, 0) se ignoriše
+    }
+
+    int denominator = m11 + m10 + m01;
+    if (denominator == 0) {
+        return 0.0;  // Da se izbegne deljenje nulom
+    }
+
+    return static_cast<double>(m11) / denominator;
+}
+
+
 QVector<double> MainWindow::parseVector(const QString &filePath)
 {
     QVector<double> vector;
@@ -315,10 +346,38 @@ QVector<double> MainWindow::parseVector(const QString &filePath)
     file.close();
     return vector;
 }
+#include <QtAlgorithms>
+
+bool containsAll(const QSet<int> &transaction, const QSet<int> &itemset) {
+    for (int x : itemset)
+        if (!transaction.contains(x))
+            return false;
+    return true;
+}
+
+bool containsSet(const QVector<QSet<int>> &list, const QSet<int> &set) {
+    for (const QSet<int> &s : list) {
+        if (s == set)
+            return true;
+    }
+    return false;
+}
+
+// Provera da li su svi (k-1)-podskupovi kandidata retki
+bool allSubsetsRare(const QSet<int> &candidate, const QVector<QSet<int>> &prevRare) {
+    for (int item : candidate) {
+        QSet<int> subset = candidate;
+        subset.remove(item);
+        if (!containsSet(prevRare, subset))
+            return false;
+    }
+    return true;
+}
 
 void MainWindow::findRareItemsets(const QString &filename)
 {
     int MIN_SUPPORT = ui->leMinSupp->text().toInt();
+    QString output1 = ui->lePbOutputRare->text();
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Ne mogu da otvorim fajl!";
@@ -327,50 +386,128 @@ void MainWindow::findRareItemsets(const QString &filename)
 
     QTextStream in(&file);
     QVector<QSet<int>> transactions;
-    QHash<QSet<int>, int> freqMap;
+    QSet<int> allItems;
 
-    // 1. Učitavanje transakcija iz fajla
+    // 1. Učitavanje transakcija
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         if (line.isEmpty()) continue;
 
         QStringList items = line.split(" ", Qt::SkipEmptyParts);
         QSet<int> transaction;
-        for (const QString &item : items)
-            transaction.insert(item.toInt());
-
+        for (const QString &item : items) {
+            int value = item.toInt();
+            transaction.insert(value);
+            allItems.insert(value);
+        }
         transactions.append(transaction);
     }
     file.close();
 
-    // 2. Generisanje i brojanje svih podskupova (rekurzivno)
-    for (const auto &transaction : transactions) {
-        QList<int> items = transaction.values();
-        int n = items.size();
+    QList<int> allItemList = allItems.values();
+    std::sort(allItemList.begin(), allItemList.end());
 
-        for (int subsetSize = 1; subsetSize <= n; ++subsetSize) {
-            QVector<bool> mask(n, false);
-            for (int i = 0; i < subsetSize; ++i) mask[i] = true;
+    QVector<QSet<int>> prevRare;    // Retki skupovi veličine k-1
+    QVector<QSet<int>> currentRare; // Retki skupovi veličine k
+    QHash<QSet<int>, int> supportCount;
 
-            do {
-                QSet<int> itemset;
-                for (int i = 0; i < n; ++i)
-                    if (mask[i]) itemset.insert(items[i]);
+    // --- Iteracija k = 1 (pojedinačne stavke) ---
+    for (int item : allItemList) {
+        QSet<int> candidate;
+        candidate.insert(item);
 
-                freqMap[itemset]++;
-            } while (std::prev_permutation(mask.begin(), mask.end()));
+        int count = 0;
+        for (const QSet<int> &t : transactions)
+            if (containsAll(t, candidate)) ++count;
+
+        if (count < MIN_SUPPORT) {
+            prevRare.append(candidate);
+            supportCount[candidate] = count;
         }
     }
 
-    // 3. Ispis retkih skupova
+    // Iterativno generisanje retkih skupova veličine k >= 2
+    int k = 2;
+    while (!prevRare.isEmpty()) {
+        currentRare.clear();
+
+        // Generiši k-kandidate spajanjem retkih (k-1)-skupova
+        int size = prevRare.size();
+
+        for (int i = 0; i < size; ++i) {
+            for (int j = i+1; j < size; ++j) {
+                QList<int> items1 = prevRare[i].values();
+                QList<int> items2 = prevRare[j].values();
+
+                std::sort(items1.begin(), items1.end());
+                std::sort(items2.begin(), items2.end());
+
+                // Proveri da li prve k-2 stavke jednaki
+                bool canJoin = true;
+                for (int idx = 0; idx < k-2; ++idx) {
+                    if (items1[idx] != items2[idx]) {
+                        canJoin = false;
+                        break;
+                    }
+                }
+                if (!canJoin)
+                    continue;
+
+                // Kreiraj kandidat k-skupa (ujedini)
+                QSet<int> candidate = prevRare[i];
+                candidate.unite(prevRare[j]);
+
+                // Pruning: proveri da li su svi (k-1) podskupovi kandidata retki
+                if (!allSubsetsRare(candidate, prevRare))
+                    continue;
+
+                // Proveri podršku kandidata
+                int count = 0;
+                for (const QSet<int> &t : transactions)
+                    if (containsAll(t, candidate)) ++count;
+
+                if (count < MIN_SUPPORT) {
+                    currentRare.append(candidate);
+                    supportCount[candidate] = count;
+                }
+            }
+        }
+
+        prevRare = currentRare;
+        k++;
+    }
+
+    // Ispis svih retkih skupova
     qDebug() << "Retki skupovi stavki (pojavljuju se manje od" << MIN_SUPPORT << "puta):";
-    for (auto it = freqMap.begin(); it != freqMap.end(); ++it) {
-        qDebug()<<it.key();
-        if (it.value() < MIN_SUPPORT) {
-            qDebug() << it.key() << " -> Pojavljivanja:" << it.value();
-        }
+    for (auto it = supportCount.begin(); it != supportCount.end(); ++it) {
+        qDebug() << it.key() << " -> Pojavljivanja:" << it.value();
     }
+    QFile outputFile(output1);
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Ne mogu da otvorim fajl za pisanje rezultata:" << output1;
+        return;
+    }
+    QTextStream out(&outputFile);
+
+    out << "Retki skupovi stavki (pojavljuju se manje od " << MIN_SUPPORT << " puta):\n";
+
+    for (auto it = supportCount.begin(); it != supportCount.end(); ++it) {
+        QString setStr;
+        for (int item : it.key()) {
+            setStr += QString::number(item) + " ";
+        }
+        setStr = setStr.trimmed();
+
+        QString line = QString("%1 -> Pojavljivanja: %2").arg(setStr).arg(it.value());
+        qDebug() << line;
+        out << line << "\n";
+    }
+
+    outputFile.close();
 }
+
+
+
 
 
 void MainWindow::freqOnBrowseButtonClicked()
@@ -464,7 +601,15 @@ void MainWindow::pbCompute()
         ui->leRes->setText(QString::number(res));
     }
     if (dist == "Mahalanobis Distance"){
+        int dim = vec1.size();
 
+        // Kreiranje identitetske matrice dim x dim
+        QVector<QVector<double>> identityMatrix(dim, QVector<double>(dim, 0.0));
+        for (int i = 0; i < dim; ++i) {
+            identityMatrix[i][i] = 1.0;
+        }
+        double res = MainWindow::mahalanobisDistance(vec1, vec2, identityMatrix);
+        ui->leRes->setText(QString::number(res));
     }
     if (dist == "Cosine Distance"){
         double res = MainWindow::cosineDistance(vec1, vec2);
@@ -475,7 +620,11 @@ void MainWindow::pbCompute()
         ui->leRes->setText(QString::number(res));
 
     }
+    if (dist == "Jaccard coefficient"){
+    int res = MainWindow::jaccardCoefficient(vec1, vec2);
+    ui->leRes->setText(QString::number(res));
 
+    }
 }
 
 void MainWindow::pbChooseApr()
@@ -487,6 +636,12 @@ void MainWindow::pbChooseApr()
 void MainWindow::pbFindRare()
 {
     MainWindow::findRareItemsets(ui->leApr->text());
+}
+
+void MainWindow::pbChooseOutput()
+{
+    QString filePath = _frequentItemsetTab->onBrowseButtonClicked();
+    ui->lePbOutputRare->setText(filePath);
 }
 
 
