@@ -64,7 +64,7 @@ private:
     void gridConfig();
     void frequentItemsetConfig();
     double minkowskiDistance(const QVector<double> &vec1, const QVector<double> &vec2, double p);
-    double mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2, const QVector<QVector<double>> &covMatrix);
+    double mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2);
     double cosineDistance(const QVector<double>& vec1, const QVector<double>& vec2);
     int hammingDistance(const QVector<double>& vec1, const QVector<double>& vec2);
     double jaccardCoefficient(const QVector<double> &vec1, const QVector<double> &vec2);

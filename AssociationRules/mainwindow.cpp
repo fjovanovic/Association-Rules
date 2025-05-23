@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QDebug>
-
+#include <cmath>
+#include <stdexcept>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -206,30 +207,62 @@ double MainWindow::minkowskiDistance(const QVector<double> &vec1, const QVector<
     return std::pow(sum, 1.0 / p);
 }
 
-double MainWindow::mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2, const QVector<QVector<double> > &covMatrix)
+double MainWindow::mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2)
 {
     if (vec1.size() != vec2.size()) {
         throw std::invalid_argument("Vectors must have the same dimension.");
     }
-    if (covMatrix.size() != vec1.size() || covMatrix[0].size() != vec1.size()) {
-        throw std::invalid_argument("Covariance matrix dimensions must match vector size.");
+
+    int n = vec1.size();
+
+    // 1. Napravi 2xN matricu od vektora
+    QVector<QVector<double>> data = {vec1, vec2};
+
+    // 2. Izračunaj srednju vrednost po koloni
+    QVector<double> mean(n, 0.0);
+    for (int i = 0; i < n; ++i) {
+        mean[i] = (vec1[i] + vec2[i]) / 2.0;
     }
 
-    QVector<double> diff(vec1.size());
-    for (int i = 0; i < vec1.size(); ++i) {
-        diff[i] = vec1[i] - vec2[i];
-    }
-
-    QVector<double> temp(vec1.size(), 0.0);
-    for (int i = 0; i < vec1.size(); ++i) {
-        for (int j = 0; j < vec1.size(); ++j) {
-            temp[i] += diff[j] * covMatrix[j][i];
+    // 3. Izračunaj kovarijacionu matricu (n x n)
+    QVector<QVector<double>> covMatrix(n, QVector<double>(n, 0.0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < 2; ++k) {  // 2 vektora
+                sum += (data[k][i] - mean[i]) * (data[k][j] - mean[j]);
+            }
+            covMatrix[i][j] = sum / 1.0;  // delimo sa (2 - 1) = 1
         }
     }
 
+    // 4. Inverzija kovarijacione matrice (pretpostavimo dijagonalnu za jednostavnost)
+    QVector<QVector<double>> invCovMatrix(n, QVector<double>(n, 0.0));
+    for (int i = 0; i < n; ++i) {
+        if (covMatrix[i][i] == 0.0) {
+            throw std::runtime_error("Covariance matrix is singular.");
+        }
+        invCovMatrix[i][i] = 1.0 / covMatrix[i][i];
+    }
+
+    // 5. diff = vec1 - vec2
+    QVector<double> diff(n);
+    for (int i = 0; i < n; ++i) {
+        diff[i] = vec1[i] - vec2[i];
+    }
+
+    // 6. temp = invCovMatrix * diff
+    QVector<double> temp(n, 0.0);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            temp[i] += invCovMatrix[i][j] * diff[j];
+        }
+    }
+
+    // 7. distance = sqrt(diff^T * temp)
     double distance = 0.0;
-    for (int i = 0; i < vec1.size(); ++i) {
-        distance += temp[i] * diff[i];
+    for (int i = 0; i < n; ++i) {
+        distance += diff[i] * temp[i];
     }
 
     return std::sqrt(distance);
@@ -347,7 +380,12 @@ QVector<double> MainWindow::parseVector(const QString &filePath)
     return vector;
 }
 #include <QtAlgorithms>
-
+uint qHash(const QSet<int> &key, uint seed = 0) {
+    uint result = seed;
+    for (int val : key)
+        result ^= qHash(val, seed);
+    return result;
+}
 bool containsAll(const QSet<int> &transaction, const QSet<int> &itemset) {
     for (int x : itemset)
         if (!transaction.contains(x))
@@ -418,14 +456,20 @@ void MainWindow::findRareItemsets(const QString &filename)
 
         int count = 0;
         for (const QSet<int> &t : transactions)
-            if (containsAll(t, candidate)) ++count;
-
+            if (containsAll(t, candidate))
+            {
+                ++count;
+               // qDebug()<<candidate<<"JUHUU";
+            }
+        qDebug()<<candidate<<" "<<count<<" "<<MIN_SUPPORT<<" -----------";
         if (count < MIN_SUPPORT) {
+//qDebug()<<candidate<<"sssssssssss   "<<count;
             prevRare.append(candidate);
             supportCount[candidate] = count;
         }
     }
-
+   // for(auto& x: prevRare)
+       // qDebug()<<x<<"-----------";
     // Iterativno generisanje retkih skupova veličine k >= 2
     int k = 2;
     while (!prevRare.isEmpty()) {
@@ -466,7 +510,7 @@ void MainWindow::findRareItemsets(const QString &filename)
                 for (const QSet<int> &t : transactions)
                     if (containsAll(t, candidate)) ++count;
 
-                if (count < MIN_SUPPORT) {
+                if (count > 0 && count < MIN_SUPPORT) {
                     currentRare.append(candidate);
                     supportCount[candidate] = count;
                 }
@@ -608,7 +652,7 @@ void MainWindow::pbCompute()
         for (int i = 0; i < dim; ++i) {
             identityMatrix[i][i] = 1.0;
         }
-        double res = MainWindow::mahalanobisDistance(vec1, vec2, identityMatrix);
+        double res = MainWindow::mahalanobisDistance(vec1, vec2);
         ui->leRes->setText(QString::number(res));
     }
     if (dist == "Cosine Distance"){
