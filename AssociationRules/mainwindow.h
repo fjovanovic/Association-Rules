@@ -6,10 +6,21 @@
 #include <QMessageBox>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QFile>
+#include <QTextStream>
+#include <QVector>
+#include <QStringList>
+#include <QCoreApplication>
+#include <QTextStream>
+#include <QHash>
+#include <QStringList>
+#include <QSet>
+#include <QDebug>
 #include <QScreen>
 
 #include "tabs/Grid/grid.h"
 #include "tabs/FrequentItemset/frequentitemset.h"
+
 
 
 QT_BEGIN_NAMESPACE
@@ -44,6 +55,15 @@ public slots:
     void freqOnOpenOutputFileButtonClicked();
     void freqOnScreenshotButtonClicked();
 
+    void pbChooseVector1();
+    void pbChooseVector2();
+    void pbCompute();
+
+    void pbChooseApr();
+    void pbFindRare();
+    void pbChooseOutput();
+
+
 private:
     Ui::MainWindow *ui;
     Grid *_gridTab;
@@ -53,6 +73,18 @@ private:
 
     void gridConfig();
     void frequentItemsetConfig();
+    double minkowskiDistance(const QVector<double> &vec1, const QVector<double> &vec2, double p);
+    double mahalanobisDistance(const QVector<double> &vec1, const QVector<double> &vec2);
+    double cosineDistance(const QVector<double>& vec1, const QVector<double>& vec2);
+    int hammingDistance(const QVector<double>& vec1, const QVector<double>& vec2);
+    double jaccardCoefficient(const QVector<double> &vec1, const QVector<double> &vec2);
+
+    QVector<double> parseVector(const QString& filePath);
+
+    void findRareItemsets(const QString &filename);
+
+
+
 };
 
 
