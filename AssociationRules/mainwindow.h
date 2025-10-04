@@ -16,6 +16,8 @@
 #include <QStringList>
 #include <QSet>
 #include <QDebug>
+#include <QScreen>
+
 #include "tabs/Grid/grid.h"
 #include "tabs/FrequentItemset/frequentitemset.h"
 
@@ -37,13 +39,21 @@ public:
 
 public slots:
     void gridOnBrowseButtonClicked();
-    void gridOnChangeButtonClicked();
+    void gridOnChangeFrequentButtonClicked();
+    void gridOnChangeRareButtonClicked();
     void gridOnRunAlgorithmButtonClicked();
+    void gridOnFrequentItemsButtonClicked();
+    void gridOnRareItemsButtonClicked();
+    void gridOnScreenshotButtonClicked();
 
     void freqOnBrowseButtonClicked();
     void freqOnChangeButtonClicked();
     void freqOnRunAlgorithmButtonClicked();
+    void freqOnDrawTransactionButtonClicked();
+    void freqOnDrawFullTreeButtonClicked();
     void freqOnForwardButtonClicked();
+    void freqOnOpenOutputFileButtonClicked();
+    void freqOnScreenshotButtonClicked();
 
     void pbChooseVector1();
     void pbChooseVector2();

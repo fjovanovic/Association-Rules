@@ -39,22 +39,25 @@
        <attribute name="title">
         <string>Grid</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QLabel" name="gridInputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Choose input file:</string>
@@ -75,6 +78,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -94,6 +100,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Browse</string>
             </property>
@@ -101,29 +110,32 @@
           </item>
          </layout>
         </item>
-        <item>
+        <item row="1" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QLabel" name="gridOutputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
-             <string>Output file:</string>
+             <string>Frequent items output file:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="gridOutputFileLine">
+           <widget class="QLineEdit" name="gridFrequentOutputFileLine">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -136,16 +148,67 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="gridChangeButton">
+           <widget class="QPushButton" name="gridChangeFrequentOutputButton">
             <property name="minimumSize">
              <size>
               <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Change</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_61">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="minimumSize">
+             <size>
+              <width>165</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>165</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Rare items output file:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="gridRareOutputFileLine">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
               <height>30</height>
              </size>
             </property>
@@ -155,6 +218,31 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="gridChangeRareOutputButton">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Change</string>
             </property>
@@ -162,7 +250,7 @@
           </item>
          </layout>
         </item>
-        <item>
+        <item row="3" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>6</number>
@@ -171,15 +259,18 @@
            <widget class="QLabel" name="gridSetParametersLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Set parameters:</string>
@@ -208,6 +299,9 @@
             </property>
             <property name="accessibleName">
              <string/>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="rowCount">
              <number>1</number>
@@ -241,7 +335,7 @@
             </item>
             <item row="0" column="2">
              <property name="text">
-              <string>(e.g. 0.25)</string>
+              <string>(0.25 for 25%)</string>
              </property>
             </item>
            </widget>
@@ -260,6 +354,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Run Algorithm</string>
             </property>
@@ -267,8 +364,144 @@
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QGraphicsView" name="gridGraphicsView"/>
+        <item row="4" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_41">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>165</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>165</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Open output file:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="gridFrequentItemsButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Frequent items</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="gridRareItemsButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Rare items</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="gridScreenshotButton">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Screenshot</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="gridHorizontalSpacer05">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="0">
+         <widget class="QGraphicsView" name="gridGraphicsView">
+          <property name="styleSheet">
+           <string notr="true">background-color: #2F2F2F;</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -283,15 +516,18 @@
            <widget class="QLabel" name="freqInputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Choose input file:</string>
@@ -312,6 +548,12 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -328,6 +570,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Browse</string>
             </property>
@@ -341,15 +586,18 @@
            <widget class="QLabel" name="freqOutputFileLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Output file:</string>
@@ -363,6 +611,12 @@
               <width>16777215</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -380,6 +634,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Change</string>
             </property>
@@ -393,15 +650,18 @@
            <widget class="QLabel" name="freqSetParametersLabel">
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>125</width>
+              <width>165</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
             </property>
             <property name="text">
              <string>Set parameters:</string>
@@ -428,6 +688,9 @@
               <height>50</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="rowCount">
              <number>1</number>
             </property>
@@ -445,7 +708,7 @@
             </item>
             <item row="0" column="2">
              <property name="text">
-              <string>(e.g. 0.25)</string>
+              <string>(0.25 for 25%)</string>
              </property>
             </item>
            </widget>
@@ -464,6 +727,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+            </property>
             <property name="text">
              <string>Run Algorithm</string>
             </property>
@@ -474,10 +740,20 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
-           <widget class="QGraphicsView" name="freqGraphicsView"/>
+           <widget class="QGraphicsView" name="freqGraphicsView">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: #2F2F2F;</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0">
+           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0">
             <property name="spacing">
              <number>15</number>
             </property>
@@ -491,7 +767,7 @@
              <number>0</number>
             </property>
             <item>
-             <spacer name="verticalSpacer">
+             <spacer name="freqVerticalSpacer_01">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -504,6 +780,50 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="freqDrawTransactionButton">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Draw transaction</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="freqDrawFullTreeButton">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Draw full tree</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="freqForwardButton">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -511,13 +831,72 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+              </property>
               <property name="text">
                <string>Forward</string>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_2">
+             <widget class="QPushButton" name="freqOpenOutputFileButton">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Open output file</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="freqScreenshotButton">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;Serif&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Screenshot</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="freqVerticalSpacer_02">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>

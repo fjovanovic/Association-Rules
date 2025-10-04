@@ -17,12 +17,18 @@ MainWindow::MainWindow(QWidget *parent)
     MainWindow::frequentItemsetConfig();
 
     connect(ui->gridBrowseButton, &QPushButton::clicked, this, &MainWindow::gridOnBrowseButtonClicked);
-    connect(ui->gridChangeButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeButtonClicked);
+    connect(ui->gridChangeFrequentOutputButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeFrequentButtonClicked);
+    connect(ui->gridChangeRareOutputButton, &QPushButton::clicked, this, &MainWindow::gridOnChangeRareButtonClicked);
     connect(ui->gridRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::gridOnRunAlgorithmButtonClicked);
+    connect(ui->gridFrequentItemsButton, &QPushButton::clicked, this, &MainWindow::gridOnFrequentItemsButtonClicked);
+    connect(ui->gridRareItemsButton, &QPushButton::clicked, this, &MainWindow::gridOnRareItemsButtonClicked);
+    connect(ui->gridScreenshotButton, &QPushButton::clicked, this, &MainWindow::gridOnScreenshotButtonClicked);
 
     connect(ui->freqBrowseButton, &QPushButton::clicked, this, &MainWindow::freqOnBrowseButtonClicked);
     connect(ui->freqChangeButton, &QPushButton::clicked, this, &MainWindow::freqOnChangeButtonClicked);
     connect(ui->freqRunAlgorithmButton, &QPushButton::clicked, this, &MainWindow::freqOnRunAlgorithmButtonClicked);
+    connect(ui->freqDrawTransactionButton, &QPushButton::clicked, this, &MainWindow::freqOnDrawTransactionButtonClicked);
+    connect(ui->freqDrawFullTreeButton, &QPushButton::clicked, this, &MainWindow::freqOnDrawFullTreeButtonClicked);
     connect(ui->freqForwardButton, &QPushButton::clicked, this, &MainWindow::freqOnForwardButtonClicked);
     connect(ui->pbChooseVec1, &QPushButton::clicked, this, &MainWindow::pbChooseVector1);
     connect(ui->pbChooseVec2, &QPushButton::clicked, this, &MainWindow::pbChooseVector2);
@@ -30,15 +36,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pbChooseApr, &QPushButton::clicked, this, &MainWindow::pbChooseApr);
     connect(ui->pbFindRare, &QPushButton::clicked, this, &MainWindow::pbFindRare);
     connect(ui->pbChooseOutput, &QPushButton::clicked, this, &MainWindow::pbChooseOutput);
+    connect(ui->freqOpenOutputFileButton, &QPushButton::clicked, this, &MainWindow::freqOnOpenOutputFileButtonClicked);
+    connect(ui->freqScreenshotButton, &QPushButton::clicked, this, &MainWindow::freqOnScreenshotButtonClicked);
 }
 
 
 void MainWindow::gridConfig()
 {
     QString inputFilePath = _gridTab->getInputFilePath();
-    QString outputFilePath = _gridTab->getOutputFilePath();
+    QString outputFrequentFilePath = _gridTab->getFrequentOutputFilePath();
+    QString outputRareFilePath = _gridTab->getRareOutputFilePath();
     ui->gridInputFileLine->setText(inputFilePath);
-    ui->gridOutputFileLine->setText(outputFilePath);
+    ui->gridFrequentOutputFileLine->setText(outputFrequentFilePath);
+    ui->gridRareOutputFileLine->setText(outputRareFilePath);
 
     QTableWidgetItem *headerItem1 = new QTableWidgetItem(QString("Parameter"), QTableWidgetItem::Type);
     ui->gridParametersTable->setHorizontalHeaderItem(0, headerItem1);
@@ -92,10 +102,16 @@ void MainWindow::gridOnBrowseButtonClicked()
 }
 
 
-void MainWindow::gridOnChangeButtonClicked()
+void MainWindow::gridOnChangeFrequentButtonClicked()
 {
-    QString filePath = _gridTab->onChangeButtonClicked();
-    ui->gridOutputFileLine->setText(filePath);
+    QString filePath = _gridTab->onChangeFrequentButtonClicked();
+    ui->gridFrequentOutputFileLine->setText(filePath);
+}
+
+void MainWindow::gridOnChangeRareButtonClicked()
+{
+    QString filePath = _gridTab->onChangeRareButtonClicked();
+    ui->gridRareOutputFileLine->setText(filePath);
 }
 
 
@@ -140,6 +156,46 @@ void MainWindow::gridOnRunAlgorithmButtonClicked()
 
     setCursor(Qt::ArrowCursor);
     ui->gridRunAlgorithmButton->setDisabled(false);
+}
+
+
+void MainWindow::gridOnFrequentItemsButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->gridFrequentItemsButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _gridTab->onFrequentItemsButtonClicked();
+
+    setCursor(Qt::ArrowCursor);
+    ui->gridFrequentItemsButton->setDisabled(false);
+}
+
+
+void MainWindow::gridOnRareItemsButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->gridRareItemsButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _gridTab->onRareItemsButtonClicked();
+
+    setCursor(Qt::ArrowCursor);
+    ui->gridRareItemsButton->setDisabled(false);
+}
+
+
+void MainWindow::gridOnScreenshotButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->gridScreenshotButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    QWidget *mainWindow = this->window();
+    _gridTab->onScreenshotButtonClicked(mainWindow);
+
+    setCursor(Qt::ArrowCursor);
+    ui->gridScreenshotButton->setDisabled(false);
 }
 
 
@@ -612,11 +668,69 @@ void MainWindow::freqOnRunAlgorithmButtonClicked()
 }
 
 
+void MainWindow::freqOnDrawTransactionButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqDrawTransactionButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _frequentItemsetTab->onDrawTransactionButtonClicked(_frequentItemsetScene);
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqDrawTransactionButton->setDisabled(false);
+}
+
+
+void MainWindow::freqOnDrawFullTreeButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqDrawFullTreeButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _frequentItemsetTab->onDrawFullTreeButtonClicked(_frequentItemsetScene);
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqDrawFullTreeButton->setDisabled(false);
+}
+
+
 void MainWindow::freqOnForwardButtonClicked()
 {
     setCursor(Qt::WaitCursor);
+    ui->freqForwardButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
     _frequentItemsetTab->onForwardButtonClicked(_frequentItemsetScene);
+
     setCursor(Qt::ArrowCursor);
+    ui->freqForwardButton->setDisabled(false);
+}
+
+
+void MainWindow::freqOnOpenOutputFileButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqOpenOutputFileButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    _frequentItemsetTab->onOpenOutputFileButtonClicked();
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqOpenOutputFileButton->setDisabled(false);
+}
+
+
+void MainWindow::freqOnScreenshotButtonClicked()
+{
+    setCursor(Qt::WaitCursor);
+    ui->freqScreenshotButton->setDisabled(true);
+    QCoreApplication::processEvents();
+
+    QWidget *mainWindow = this->window();
+    _frequentItemsetTab->onScreenshotButtonClicked(mainWindow);
+
+    setCursor(Qt::ArrowCursor);
+    ui->freqScreenshotButton->setDisabled(false);
 }
 
 void MainWindow::pbChooseVector1()

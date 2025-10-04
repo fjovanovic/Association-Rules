@@ -12,6 +12,9 @@
 #include <QBrush>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsTextItem>
+#include <QMap>
+#include <QGuiApplication>
+#include <QScreen>
 
 #include <cmath>
 
@@ -24,12 +27,17 @@ public:
 
     // Getters
     QString getInputFilePath();
-    QString getOutputFilePath();
+    QString getFrequentOutputFilePath();
+    QString getRareOutputFilePath();
 
     // Slots
     QString onBrowseButtonClicked();
-    QString onChangeButtonClicked();
+    QString onChangeFrequentButtonClicked();
+    QString onChangeRareButtonClicked();
     void onRunAlgorithmButtonClicked(QGraphicsScene *scene, const double minSupport);
+    void onFrequentItemsButtonClicked();
+    void onRareItemsButtonClicked();
+    void onScreenshotButtonClicked(QWidget *mainWindow);
 
 private:
     // Fields
@@ -41,10 +49,12 @@ private:
     QBrush _rareItemsetsBrush;
     QPen _textPen;
     QString _inputFilePath;
-    QString _outputFilePath;
+    QString _outputFrequentFilePath;
+    QString _outputRareFilePath;
     QString _inputOpenFilePath;
     QString _outputOpenFilePath;
     QVector<QVector<int>> _transactions;
+    QMap<int, QString> _itemMap;
 
     // Functions
     bool readFile(QSet<int> &gridItems);
@@ -69,12 +79,13 @@ private:
         const QVector<QVector<int>> &closedAndMaximalItemsets
     );
     bool saveFile(
-        const QVector<QPair<QVector<int>, int>> &frequentItemsets,
+        const QVector<QVector<int>> &gridSets,
+        const QVector<int> &gridSupports,
+        const QMap<QVector<int>, int> &frequentItemsets,
         const QVector<QVector<int>> &closedItemsets,
         const QVector<QVector<int>> &maximalItemsets,
         const QVector<QVector<int>> &closedAndMaximalItemsets
     );
-
     QVector<QVector<int>> generateSubsets(const QVector<int> &set);
     QVector<QPair<QVector<int>, int>> sortBySetSize(const QMap<QVector<int>, int> &frequentItemsets);
 };
