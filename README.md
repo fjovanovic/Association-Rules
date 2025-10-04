@@ -31,7 +31,7 @@ represented as strings / numbers separated by comma and space
 is defined as the quotient of the number of transactions 
 containing A and B in relation to the total number of 
 transactions:
-$sup(A \implies B) = \frac{\#(A \cup B)}{N}$
+$sup(A \implies B) = \frac{\\#(A \cup B)}{N}$
   <details>
     <summary>Example</summary>
       <table>
@@ -68,7 +68,7 @@ $sup(A \implies B) = \frac{\#(A \cup B)}{N}$
 **conf**, is defined as the quotient of the number of 
 transactions containing A and B in relation to the number of 
 transactions containing A: 
-$conf(A \implies B) = \frac{\#(A \cup B)}{\#(A)}$
+$conf(A \implies B) = \frac{\\#(A \cup B)}{\\#(A)}$
   <details>
     <summary>Example</summary>
       <table>
